@@ -1,0 +1,13 @@
+[requires]
+drogon/1.9.10
+
+[options]
+drogon/*:with_orm=True
+drogon/*:with_postgres=True
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[layout]
+cmake_layout

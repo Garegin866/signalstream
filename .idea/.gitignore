@@ -1,0 +1,17 @@
+# CLion / IntelliJ
+.idea/
+cmake-build-*/
+*.iml
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Conan
+build/
+conan.lock
+
+# OS files
+.DS_Store
