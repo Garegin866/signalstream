@@ -1,0 +1,20 @@
+# CLion / IntelliJ
+.idea/
+cmake-build-*/
+*.iml
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Conan & build outputs
+build/
+conan.lock
+
+# OS
+.DS_Store
+
+# CMake local presets
+CMakeUserPresets.json
