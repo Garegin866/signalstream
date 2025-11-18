@@ -9,6 +9,7 @@ find_package(Drogon REQUIRED)
 add_executable(signalstream
         main.cpp
         controllers/HealthController.cpp
+        controllers/AuthController.cpp
 )
 
 target_include_directories(signalstream PRIVATE
