@@ -61,15 +61,15 @@ docker-compose.yml    # PostgreSQL container
            └───────▲────────┘
                    │
            ┌───────┴────────┐
-           │    Services     │   → validation, orchestration, rules
+           │    Services    │   → validation, orchestration, rules
            └───────▲────────┘
                    │
            ┌───────┴────────┐
-           │  Repositories   │   → SQL only, async, no JSON
+           │  Repositories  │   → SQL only, async, no JSON
            └───────▲────────┘
                    │
            ┌───────┴────────┐
-           │       DTO       │   → typed data flow
+           │       DTO      │   → typed data flow
            └────────────────┘
 ```
 
