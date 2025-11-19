@@ -1,41 +1,263 @@
-# SignalStream (working title)
+# 🔥 SignalStream
+A modern, clean-architecture backend built with **C++20**, **Drogon**, **PostgreSQL**, and **Docker**.
 
-Backend playground in modern C++ for learning real backend development:
-HTTP API, PostgreSQL, Docker, and later gRPC, background workers, and more.
+SignalStream is a modular, scalable backend designed as a real-world production system — featuring authentication, tagging, content feeds, async DB access, and strict architectural boundaries.
 
-Right now it's just a skeleton with a single health check endpoint.
+The project uses best practices from modern backend engineering:
+- Clean Architecture
+- DTO-based data flow
+- Repository–Service–Controller pattern
+- Strong typing
+- Session-based authentication
+- Secure password hashing (Argon2id)
+- GitHub Projects as backlog
 
-## Tech stack
+---
 
-- C++20
-- Drogon (HTTP framework)
-- Conan 2 (dependency management)
-- CMake
-- (Later) PostgreSQL, Docker, gRPC, Kafka, etc.
+# 🚀 Features
 
-## Status
+### ✅ Authentication Module
+- Register
+- Login
+- Logout (coming soon)
+- Session token generation (UUID, pluggable for JWT)
+- Secure hashing with Argon2id
+- Strict error handling
 
-- ✅ Backend builds
-- ✅ `/health` endpoint returns `{"status": "ok"}`
-- ⏳ Database connection (PostgreSQL)
-- ⏳ Auth, users, feed
-- ⏳ Docker setup for app + DB
+### ✅ Tags Module
+- Create tags
+- List tags
+- Attach tags to users (coming)
+- Feed filtering based on user tags (coming)
 
-## Build & run (CLI)
+### 🔧 Architecture Highlights
+- **No SQL in controllers**
+- **No JSON in repositories**
+- **Async Postgres queries with Drogon ORM**
+- **Separation into controllers → services → repositories → dto → core**
+- **Fully typed error system** (ErrorType, AppError)
+- **Consistent JSON response layer**
 
-Requirements:
-- Conan 2
-- CMake
-- A C++20 compiler (AppleClang / clang++)
+---
+
+# 📂 Project Structure
+
+```
+server/
+  controllers/        # HTTP endpoints only
+  services/           # Business logic & validation
+  repositories/       # Raw SQL data access
+  dto/                # Typed C++ data models
+  core/               # Utilities: errors, hashing, tokens, responses
+  CMakeLists.txt
+docker-compose.yml    # PostgreSQL container
+```
+
+### Layered Architecture
+
+```
+           ┌────────────────┐
+           │  Controllers   │   → HTTP only, no logic
+           └───────▲────────┘
+                   │
+           ┌───────┴────────┐
+           │    Services     │   → validation, orchestration, rules
+           └───────▲────────┘
+                   │
+           ┌───────┴────────┐
+           │  Repositories   │   → SQL only, async, no JSON
+           └───────▲────────┘
+                   │
+           ┌───────┴────────┐
+           │       DTO       │   → typed data flow
+           └────────────────┘
+```
+
+---
+
+# 🛠 Getting Started
+
+### 1. Clone the repo
 
 ```bash
-# From project root
-conan install . -s build_type=Debug -b=missing
+git clone https://github.com/<yourname>/SignalStream.git
+cd SignalStream
+```
 
-mkdir -p build/Debug
-cd build/Debug
+### 2. Install dependencies (Conan 2)
 
-cmake ../.. -DCMAKE_TOOLCHAIN_FILE=generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Debug
-cmake --build .
+```bash
+conan install . --output-folder=build --build=missing
+```
 
-./server/signalstream
+### 3. Build the backend
+
+```bash
+cd build
+cmake ..
+cmake --build . -j$(nproc)
+```
+
+### 4. Run PostgreSQL with Docker
+
+```bash
+docker compose up -d
+```
+
+### 5. Run the server
+
+```bash
+./server
+```
+
+API now runs on:
+
+```
+http://localhost:8080
+```
+
+---
+
+# 📦 Endpoints
+
+## 🔐 Auth
+
+### `POST /auth/register`
+```json
+{
+  "email": "user@example.com",
+  "password": "mypassword"
+}
+```
+
+### `POST /auth/login`
+```json
+{
+  "email": "user@example.com",
+  "password": "mypassword"
+}
+```
+
+Returns:
+```json
+{
+  "token": "uuid-here"
+}
+```
+
+---
+
+## 🏷 Tags
+
+### `GET /tags`
+Lists all tags:
+```json
+{
+  "tags": [
+    { "id": 1, "name": "cpp" },
+    { "id": 2, "name": "backend" }
+  ]
+}
+```
+
+### `POST /tags`
+```json
+{
+  "name": "drogon"
+}
+```
+
+---
+
+# 🔐 Security
+
+- Passwords hashed via **Argon2id**
+- Tokens generated via UUID (secure RNG)
+- Database exceptions sanitized (no internal details leaked)
+- Strict `ErrorType` mapping
+- No plaintext passwords stored
+- All user input validated in services
+
+---
+
+# 🗂 Project Management
+
+SignalStream uses **GitHub Projects** for backlog & contributors:
+
+- **Issues** → tasks
+- **Boards** → workflow
+- **Labels** → categorization
+- **Milestones** → modules (Auth, Tags, Items)
+
+PRs must contain:
+
+```
+Closes #<issue-number>
+```
+
+to link into the workflow.
+
+---
+
+# 🤝 Contributing
+
+We welcome contributions!  
+Please read:
+
+👉 [`CONTRIBUTING.md`](./CONTRIBUTING.md)
+
+Includes:
+- setup instructions
+- branch naming conventions
+- coding guidelines
+- commit format
+- PR rules
+- architectural rules
+
+All contributions must follow the existing service/repository architecture.
+
+---
+
+# 📌 Roadmap
+
+### 🔐 Auth Module
+- [x] Register
+- [x] Login
+- [ ] Logout
+- [ ] /auth/me
+- [ ] Token middleware
+- [ ] Password reset
+
+### 🏷 Tags
+- [x] Create tag
+- [x] List tags
+- [ ] Attach tags to user
+- [ ] User feed filter
+
+### 📦 Items
+- [ ] Item CRUD
+- [ ] item_tags relation
+- [ ] Personalized feed
+
+### 🛡 Security
+- [x] Argon2id hashing
+- [ ] Rate limiting
+- [ ] Session expiration
+- [ ] IP-based suspicious login detection
+
+---
+
+# 📜 License
+
+MIT License.  
+Do whatever you want — just don't blame us if you break the server.
+
+---
+
+# ⭐ Support the Project
+
+If you're learning C++ backend or Drogon, star the repo — it helps visibility.
+
+```
+⭐ Star this repository to support development!
+```
