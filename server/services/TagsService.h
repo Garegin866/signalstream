@@ -1,0 +1,17 @@
+#pragma once
+#include "dto/TagDTO.h"
+#include "core/Error.h"
+
+#include <functional>
+
+class TagsService {
+public:
+    static void createTag(
+            const std::string &name,
+            std::function<void(const TagDTO&, const AppError&)> cb
+    );
+
+    static void listTags(
+            std::function<void(const std::vector<TagDTO>&, const AppError&)> cb
+    );
+};

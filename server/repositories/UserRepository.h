@@ -1,0 +1,20 @@
+#pragma once
+#include <drogon/orm/DbClient.h>
+#include "../dto/AuthDTO.h"
+#include "../core/Error.h"
+
+class UserRepository {
+public:
+    static void createUser(
+            drogon::orm::DbClientPtr client,
+            const std::string &email,
+            const std::string &passwordHash,
+            std::function<void(const UserDTO&, const AppError&)> cb
+    );
+
+    static void findByEmail(
+            drogon::orm::DbClientPtr client,
+            const std::string &email,
+            std::function<void(const std::optional<UserDTO>&, const std::string &passwordHash, const AppError&)> cb
+    );
+};
