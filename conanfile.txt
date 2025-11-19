@@ -1,5 +1,6 @@
 [requires]
 drogon/1.9.10
+argon2/20190702
 
 [options]
 drogon/*:with_orm=True

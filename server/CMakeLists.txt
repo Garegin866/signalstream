@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Drogon REQUIRED)
+find_package(argon2 REQUIRED CONFIG)
 
 set(REPOSITORIES
         repositories/TagsRepository.cpp
@@ -22,14 +23,14 @@ set(CONTROLLERS
         controllers/AuthController.cpp
 )
 
-add_executable(signalstream
+add_executable(${PROJECT_NAME}
         main.cpp
         ${REPOSITORIES}
         ${SERVICES}
         ${CONTROLLERS}
 )
 
-target_include_directories(signalstream PRIVATE
+target_include_directories(${PROJECT_NAME} PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/controllers
         ${CMAKE_CURRENT_SOURCE_DIR}/core
@@ -37,5 +38,6 @@ target_include_directories(signalstream PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/repositories
         ${CMAKE_CURRENT_SOURCE_DIR}/services
 )
-
-target_link_libraries(signalstream PRIVATE Drogon::Drogon)
+#
+target_link_libraries(${PROJECT_NAME} PRIVATE Drogon::Drogon)
+target_link_libraries(${PROJECT_NAME} PRIVATE argon2::argon2)
