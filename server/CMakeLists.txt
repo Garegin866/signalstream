@@ -17,11 +17,13 @@ set(REPOSITORIES
 set(SERVICES
         services/TagsService.cpp
         services/AuthService.cpp
+        services/UserTagService.cpp
 )
 
 set(CONTROLLERS
         controllers/TagsController.cpp
         controllers/AuthController.cpp
+        controllers/UserTagController.cpp
 )
 
 add_executable(${PROJECT_NAME}

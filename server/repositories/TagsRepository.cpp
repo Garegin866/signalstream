@@ -64,3 +64,28 @@ void TagsRepository::listTags(
             }
     );
 }
+
+void TagsRepository::findById(
+        drogon::orm::DbClientPtr client,
+        int tagId,
+        std::function<void(const std::optional<TagDTO>&, const AppError&)> cb
+) {
+    client->execSqlAsync(
+            "SELECT id, name FROM tags WHERE id=$1 LIMIT 1;",
+            [cb](const drogon::orm::Result &r) {
+                if (r.empty()) {
+                    cb(std::nullopt, AppError{ErrorType::NotFound, "Tag not found"});
+                    return;
+                }
+
+                TagDTO dto;
+                dto.id = r[0]["id"].as<int>();
+                dto.name = r[0]["name"].as<std::string>();
+                cb(dto, AppError{});
+            },
+            [cb](const std::exception_ptr&) {
+                cb(std::nullopt, AppError{ErrorType::Database, "Database error"});
+            },
+            tagId
+    );
+}
