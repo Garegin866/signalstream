@@ -49,3 +49,20 @@ void SessionRepository::findByToken(
             token
     );
 }
+
+void SessionRepository::deleteByToken(
+        drogon::orm::DbClientPtr client,
+        const std::string &token,
+        std::function<void(bool, const AppError&)> cb
+) {
+    client->execSqlAsync(
+            "DELETE FROM sessions WHERE token=$1;",
+            [cb](const drogon::orm::Result &r) {
+                cb(true, AppError{});
+            },
+            [cb](const std::exception_ptr&) {
+                cb(false, AppError{ErrorType::Database, "Database error"});
+            },
+            token
+    );
+}

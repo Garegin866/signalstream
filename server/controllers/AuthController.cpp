@@ -108,3 +108,32 @@ void AuthController::me(
             }
     );
 }
+
+void AuthController::logout(
+        const HttpRequestPtr &req,
+        std::function<void(const HttpResponsePtr&)> &&callback
+) {
+    auto auth = req->getHeader("Authorization");
+    if (auth.size() < 8 || auth.substr(0,7) != "Bearer ") {
+        callback(jsonError(401, "Unauthorized"));
+        return;
+    }
+
+    std::string token = auth.substr(7);
+
+    AuthService::logout(
+            token,
+            [callback](const AppError& err) {
+                if (err.hasError()) {
+                    callback(jsonError(500, "Internal error"));
+                    return;
+                }
+
+                Json::Value res;
+                res["ok"] = true;
+                auto resp = HttpResponse::newHttpJsonResponse(res);
+                resp->setStatusCode(k200OK);
+                callback(resp);
+            }
+    );
+}

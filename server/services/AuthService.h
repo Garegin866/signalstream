@@ -22,4 +22,9 @@ public:
             const std::string &token,
             std::function<void(const UserDTO&, const AppError&)> cb
     );
+
+    static void logout(
+            const std::string &token,
+            std::function<void(const AppError&)> cb
+    );
 };
