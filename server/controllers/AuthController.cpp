@@ -102,9 +102,7 @@ void AuthController::me(
                 body["id"] = user.id;
                 body["email"] = user.email;
 
-                auto resp = HttpResponse::newHttpJsonResponse(body);
-                resp->setStatusCode(k200OK);
-                callback(resp);
+                callback(jsonOK(body));
             }
     );
 }
@@ -129,11 +127,10 @@ void AuthController::logout(
                     return;
                 }
 
-                Json::Value res;
-                res["ok"] = true;
-                auto resp = HttpResponse::newHttpJsonResponse(res);
-                resp->setStatusCode(k200OK);
-                callback(resp);
+                Json::Value ok;
+                ok["ok"] = true;
+
+                callback(jsonOK(ok));
             }
     );
 }

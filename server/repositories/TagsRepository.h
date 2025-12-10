@@ -15,4 +15,10 @@ public:
             drogon::orm::DbClientPtr client,
             std::function<void(const std::vector<TagDTO>&, const AppError&)> cb
     );
+
+    static void findById(
+            drogon::orm::DbClientPtr client,
+            int tagId,
+            std::function<void(const std::optional<TagDTO>&, const AppError&)> cb
+    );
 };
