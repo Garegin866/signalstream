@@ -77,3 +77,34 @@ void AuthController::loginUser(
             }
     );
 }
+
+void AuthController::me(
+        const HttpRequestPtr& req,
+        std::function<void(const HttpResponsePtr&)>&& callback
+) {
+    auto auth = req->getHeader("Authorization");
+    if (auth.size() < 8 || auth.substr(0,7) != "Bearer ") {
+        callback(jsonError(401, "Unauthorized"));
+        return;
+    }
+
+    std::string token = auth.substr(7);
+
+    AuthService::me(
+            token,
+            [callback](const UserDTO& user, const AppError& err) {
+                if (err.hasError()) {
+                    callback(jsonError(401, "Unauthorized"));
+                    return;
+                }
+
+                Json::Value body;
+                body["id"] = user.id;
+                body["email"] = user.email;
+
+                auto resp = HttpResponse::newHttpJsonResponse(body);
+                resp->setStatusCode(k200OK);
+                callback(resp);
+            }
+    );
+}

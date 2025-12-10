@@ -26,7 +26,7 @@ void TagsRepository::createTag(
                     }
                     cb({}, AppError{ErrorType::Database, "Database error"});
                 } catch (...) {
-                    cb({}, AppError{ErrorType::Unknown, "Internal error"});
+                    cb({}, AppError{ErrorType::NotFound, "Internal error"});
                 }
             },
             name
@@ -59,7 +59,7 @@ void TagsRepository::listTags(
                 } catch (const drogon::orm::DrogonDbException &) {
                     cb({}, AppError{ErrorType::Database, "Database error"});
                 } catch (...) {
-                    cb({}, AppError{ErrorType::Unknown, "Internal error"});
+                    cb({}, AppError{ErrorType::NotFound, "Internal error"});
                 }
             }
     );
