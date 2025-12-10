@@ -17,4 +17,10 @@ public:
             const std::string& token,
             std::function<void(const std::optional<SessionDTO>&, const AppError&)> cb
     );
+
+    static void deleteByToken(
+            drogon::orm::DbClientPtr client,
+            const std::string& token,
+            std::function<void(bool, const AppError&)> cb
+    );
 };

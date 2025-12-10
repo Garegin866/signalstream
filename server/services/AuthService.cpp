@@ -102,3 +102,21 @@ void AuthService::me(
             }
     );
 }
+
+void AuthService::logout(
+        const std::string &token,
+        std::function<void(const AppError&)> cb
+) {
+    auto client = drogon::app().getDbClient();
+
+    SessionRepository::deleteByToken(
+            client, token,
+            [cb](bool ok, const AppError& err) {
+                if (err.hasError()) {
+                    cb(AppError{ErrorType::Database, "Could not delete session"});
+                    return;
+                }
+                cb(AppError{}); // success
+            }
+    );
+}
