@@ -35,3 +35,22 @@ void UserTagService::attachTag(
             }
     );
 }
+
+void UserTagService::listUserTags(
+        int userId,
+        std::function<void(const std::vector<TagDTO>&, const AppError&)> cb
+) {
+    auto client = drogon::app().getDbClient();
+
+    UserTagsRepository::listForUser(
+            client,
+            userId,
+            [cb](const std::vector<TagDTO>& tags, const AppError& err) {
+                if (err.hasError()) {
+                    cb({}, err);
+                    return;
+                }
+                cb(tags, AppError{});
+            }
+    );
+}
