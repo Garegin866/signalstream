@@ -17,4 +17,10 @@ public:
             const std::string &email,
             std::function<void(const std::optional<UserDTO>&, const std::string &passwordHash, const AppError&)> cb
     );
+
+    static void findById(
+            drogon::orm::DbClientPtr client,
+            int userId,
+            std::function<void(const std::optional<UserDTO>&, const AppError&)> cb
+    );
 };

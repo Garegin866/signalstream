@@ -25,7 +25,7 @@ void UserRepository::createUser(
                     }
                     cb({}, AppError{ErrorType::Database, "Database error"});
                 } catch (...) {
-                    cb({}, AppError{ErrorType::Unknown, "Internal error"});
+                    cb({}, AppError{ErrorType::NotFound, "Internal error"});
                 }
             },
             email, passwordHash
@@ -54,5 +54,31 @@ void UserRepository::findByEmail(
                 cb(std::nullopt, "", AppError{ErrorType::Database, "Database error"});
             },
             email
+    );
+}
+
+void UserRepository::findById(
+        drogon::orm::DbClientPtr client,
+        int userId,
+        std::function<void(const std::optional<UserDTO>&, const AppError&)> cb
+) {
+    client->execSqlAsync(
+            "SELECT id, email FROM users WHERE id=$1 LIMIT 1;",
+            [cb](const drogon::orm::Result &r) {
+                if (r.empty()) {
+                    cb(std::nullopt, AppError{ErrorType::NotFound, "User not found"});
+                    return;
+                }
+
+                UserDTO dto;
+                dto.id = r[0]["id"].as<int>();
+                dto.email = r[0]["email"].as<std::string>();
+
+                cb(dto, AppError{});
+            },
+            [cb](const std::exception_ptr&) {
+                cb(std::nullopt, AppError{ErrorType::Database, "Database error"});
+            },
+            userId
     );
 }

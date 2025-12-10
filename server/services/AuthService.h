@@ -17,4 +17,9 @@ public:
             const std::string &password,
             std::function<void(const SessionDTO&, const AppError&)> cb
     );
+
+    static void me(
+            const std::string &token,
+            std::function<void(const UserDTO&, const AppError&)> cb
+    );
 };

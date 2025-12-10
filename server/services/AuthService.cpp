@@ -63,3 +63,42 @@ void AuthService::loginUser(
             }
     );
 }
+
+void AuthService::me(
+        const std::string &token,
+        std::function<void(const UserDTO&, const AppError&)> cb
+) {
+    auto client = drogon::app().getDbClient();
+
+    SessionRepository::findByToken(
+            client, token,
+            [client, cb](const std::optional<SessionDTO>& session, const AppError &err) {
+                if (err.hasError()) {
+                    cb({}, AppError{ErrorType::Unauthorized, "Invalid or expired session"});
+                    return;
+                }
+                if (!session.has_value()) {
+                    cb({}, AppError{ErrorType::Unauthorized, "Invalid session"});
+                    return;
+                }
+
+                int userId = session->userId;
+
+                UserRepository::findById(
+                        client, userId,
+                        [cb](const std::optional<UserDTO>& user, const AppError& err2) {
+                            if (err2.hasError()) {
+                                cb({}, AppError{ErrorType::Database, "Database error"});
+                                return;
+                            }
+                            if (!user.has_value()) {
+                                cb({}, AppError{ErrorType::Unauthorized, "User not found"});
+                                return;
+                            }
+
+                            cb(user.value(), AppError{});
+                        }
+                );
+            }
+    );
+}
