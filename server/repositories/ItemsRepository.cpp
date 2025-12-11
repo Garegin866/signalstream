@@ -146,13 +146,13 @@ void ItemsRepository::getItemsByTagIds(
         const std::vector<int>& tagIds,
         std::function<void(const std::vector<ItemDTO>&, const AppError&)> cb
 ) {
-    auto query = std::string("SELECT DISTINCT i.id, i.title FROM items i WHERE i.id IN (");
+    std::string arr = toPgArray(tagIds);
 
     client->execSqlAsync(
             "SELECT DISTINCT i.id, i.title "
             "FROM items i "
             "JOIN item_tags it ON i.id = it.item_id "
-            "WHERE it.tag_id = ANY($1) "
+            "WHERE it.tag_id = ANY($1::int[]) "
             "ORDER BY i.id DESC;",
             [cb](const drogon::orm::Result& r) {
                 std::vector<ItemDTO> items;
@@ -170,6 +170,6 @@ void ItemsRepository::getItemsByTagIds(
             [cb](const std::exception_ptr&) {
                 cb({}, AppError{ErrorType::Database, "Database error"});
             },
-            toPgArray(tagIds)
+            arr
     );
 }
