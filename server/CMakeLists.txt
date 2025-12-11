@@ -20,6 +20,7 @@ set(SERVICES
         services/AuthService.cpp
         services/UserTagService.cpp
         services/FeedService.cpp
+        services/ItemsService.cpp
 )
 
 set(CONTROLLERS
