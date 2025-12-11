@@ -12,18 +12,21 @@ set(REPOSITORIES
         repositories/SessionRepository.cpp
         repositories/UserRepository.cpp
         repositories/UserTagsRepository.cpp
+        repositories/ItemsRepository.cpp
 )
 
 set(SERVICES
         services/TagsService.cpp
         services/AuthService.cpp
         services/UserTagService.cpp
+        services/FeedService.cpp
 )
 
 set(CONTROLLERS
         controllers/TagsController.cpp
         controllers/AuthController.cpp
         controllers/UserTagController.cpp
+        controllers/FeedController.cpp
 )
 
 add_executable(${PROJECT_NAME}
