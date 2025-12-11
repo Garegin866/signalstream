@@ -31,6 +31,7 @@ set(CONTROLLERS
         controllers/UserTagController.cpp
         controllers/FeedController.cpp
         controllers/ItemTagsController.cpp
+        controllers/ItemsController.cpp
 )
 
 add_executable(${PROJECT_NAME}

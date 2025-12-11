@@ -12,8 +12,10 @@ CREATE TABLE IF NOT EXISTS user_tags (
 CREATE TABLE IF NOT EXISTS items (
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
-    body TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+    description TEXT DEFAULT '',
+    url TEXT DEFAULT '',
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS item_tags (
