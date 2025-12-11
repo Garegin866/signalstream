@@ -26,21 +26,29 @@ void FeedController::getFeed(
 
                 FeedService::getFeed(
                         user.id,
-                        [cb](const std::vector<ItemDTO>& items, const AppError& err2) {
-                            if (err2.hasError()) {
-                                cb(jsonError(500, "Internal error"));
-                                return;
+                        [cb](const std::vector<FeedItemDTO>& items, const AppError& err) {
+                            Json::Value out(Json::arrayValue);
+
+                            for (const auto& item : items) {
+                                Json::Value v;
+                                v["id"] = item.id;
+                                v["title"] = item.title;
+                                v["description"] = item.description;
+                                v["url"] = item.url;
+
+                                Json::Value tags(Json::arrayValue);
+                                for (const auto& t : item.tags) {
+                                    Json::Value tv;
+                                    tv["id"] = t.id;
+                                    tv["name"] = t.name;
+                                    tags.append(tv);
+                                }
+
+                                v["tags"] = tags;
+                                out.append(v);
                             }
 
-                            Json::Value arr(Json::arrayValue);
-                            for (auto &item : items) {
-                                arr.append(toJson(item));
-                            }
-
-                            Json::Value root;
-                            root["items"] = arr;
-
-                            cb(jsonOK(root));
+                            cb(jsonOK(out));
                         }
                 );
             }
