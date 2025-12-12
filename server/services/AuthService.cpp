@@ -11,7 +11,7 @@ void AuthService::registerUser(
         std::function<void(const UserDTO&, const AppError&)> cb
 ) {
     if (email.empty() || password.empty()) {
-        cb({}, AppError{ErrorType::Validation, "Email and password required"});
+        cb({}, AppError::Validation("Email and password required"));
         return;
     }
 
@@ -27,7 +27,7 @@ void AuthService::loginUser(
         std::function<void(const SessionDTO&, const AppError&)> cb
 ) {
     if (email.empty() || password.empty()) {
-        cb({}, AppError{ErrorType::Validation, "Email and password required"});
+        cb({}, AppError::Validation("Email and password required"));
         return;
     }
 
@@ -43,12 +43,12 @@ void AuthService::loginUser(
                 }
 
                 if (!user.has_value()) {
-                    cb({}, AppError{ErrorType::Unauthorized, "Invalid credentials"});
+                    cb({}, AppError::Unauthorized("Invalid credentials"));
                     return;
                 }
 
                 if (!PasswordHasher::verify(password, hash)) {
-                    cb({}, AppError{ErrorType::Unauthorized, "Invalid credentials"});
+                    cb({}, AppError::Unauthorized("Invalid credentials"));
                     return;
                 }
 
@@ -74,11 +74,11 @@ void AuthService::me(
             client, token,
             [client, cb](const std::optional<SessionDTO>& session, const AppError &err) {
                 if (err.hasError()) {
-                    cb({}, AppError{ErrorType::Unauthorized, "Invalid or expired session"});
+                    cb({}, AppError::Unauthorized("Invalid or expired session"));
                     return;
                 }
                 if (!session.has_value()) {
-                    cb({}, AppError{ErrorType::Unauthorized, "Invalid session"});
+                    cb({}, AppError::Unauthorized("Invalid session"));
                     return;
                 }
 
@@ -88,11 +88,11 @@ void AuthService::me(
                         client, userId,
                         [cb](const std::optional<UserDTO>& user, const AppError& err2) {
                             if (err2.hasError()) {
-                                cb({}, AppError{ErrorType::Database, "Database error"});
+                                cb({}, AppError::Database("Database error"));
                                 return;
                             }
                             if (!user.has_value()) {
-                                cb({}, AppError{ErrorType::Unauthorized, "User not found"});
+                                cb({}, AppError::Unauthorized("User not found"));
                                 return;
                             }
 
@@ -113,7 +113,7 @@ void AuthService::logout(
             client, token,
             [cb](bool ok, const AppError& err) {
                 if (err.hasError()) {
-                    cb(AppError{ErrorType::Database, "Could not delete session"});
+                    cb(AppError::Database("Could not delete session"));
                     return;
                 }
                 cb(AppError{}); // success

@@ -20,7 +20,7 @@ void FeedController::getFeed(
             token,
             [cb](const UserDTO& user, const AppError& err) {
                 if (err.hasError()) {
-                    cb(jsonError(401, "Unauthorized"));
+                    cb(makeErrorResponse(err));
                     return;
                 }
 

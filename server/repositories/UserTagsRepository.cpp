@@ -20,13 +20,13 @@ void UserTagsRepository::attach(
 
                     // Duplicate key = user already has this tag
                     if (msg.find("duplicate key value violates unique constraint") != std::string::npos) {
-                        cb(false, AppError{ErrorType::Duplicate, "User already has this tag"});
+                        cb(false, AppError::Duplicate("User already has this tag"));
                         return;
                     }
 
-                    cb(false, AppError{ErrorType::Database, "Database error"});
+                    cb(false, AppError::Database("Database error"));
                 } catch (...) {
-                    cb(false, AppError{ErrorType::NotFound, "Unknown error"});
+                    cb(false, AppError::NotFound("Unknown error"));
                 }
             },
             userId, tagId
@@ -58,7 +58,7 @@ void UserTagsRepository::listForUser(
                 cb(tags, AppError{});
             },
             [cb](const std::exception_ptr&) {
-                cb({}, AppError{ErrorType::Database, "Database error"});
+                cb({}, AppError::Database("Database error"));
             },
             userId
     );

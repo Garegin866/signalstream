@@ -21,7 +21,7 @@ static void validateItemAndTag(
                     return;
                 }
                 if (!item) {
-                    cb(false, AppError{ErrorType::NotFound, "Item not found"});
+                    cb(false, AppError::NotFound("Item not found"));
                     return;
                 }
 
@@ -35,7 +35,7 @@ static void validateItemAndTag(
                                 return;
                             }
                             if (!tag) {
-                                cb(false, AppError{ErrorType::NotFound, "Tag not found"});
+                                cb(false, AppError::NotFound("Tag not found"));
                                 return;
                             }
 

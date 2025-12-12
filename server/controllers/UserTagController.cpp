@@ -22,7 +22,7 @@ void UserTagController::attach(
             token,
             [req, callback](const UserDTO &user, const AppError &authErr) {
                 if (authErr.hasError()) {
-                    callback(jsonError(401, "Unauthorized"));
+                    callback(makeErrorResponse(authErr));
                     return;
                 }
 
@@ -45,17 +45,8 @@ void UserTagController::attach(
                         tagId,
                         [callback](const AppError &err) {
                             if (err.hasError()) {
-                                switch (err.type) {
-                                    case ErrorType::Duplicate:
-                                        callback(jsonError(409, err.message));
-                                        return;
-                                    case ErrorType::NotFound:
-                                        callback(jsonError(404, err.message));
-                                        return;
-                                    default:
-                                        callback(jsonError(500, "Internal error"));
-                                        return;
-                                }
+                                callback(makeErrorResponse(err));
+                                return;
                             }
 
                             Json::Value ok;
@@ -84,7 +75,7 @@ void UserTagController::list(
             token,
             [callback](const UserDTO& user, const AppError& authErr) {
                 if (authErr.hasError()) {
-                    callback(jsonError(401, "Unauthorized"));
+                    callback(makeErrorResponse(authErr));
                     return;
                 }
 

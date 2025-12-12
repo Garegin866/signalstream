@@ -7,7 +7,7 @@ void TagsService::createTag(
         std::function<void(const TagDTO&, const AppError&)> cb
 ) {
     if (name.empty()) {
-        cb({}, AppError{ErrorType::Validation, "name required"});
+        cb({}, AppError::Validation("name required"));
         return;
     }
 

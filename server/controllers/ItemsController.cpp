@@ -21,7 +21,7 @@ void ItemsController::createItem(
             title, description, url,
             [cb](const ItemDTO& item, const AppError& err) {
                 if (err.hasError()) {
-                    cb(jsonError(400, err.message));
+                    cb(makeErrorResponse(err));
                     return;
                 }
 
@@ -46,7 +46,7 @@ void ItemsController::getItem(
             itemId,
             [cb](const std::optional<ItemDTO>& item, const AppError& err) {
                 if (err.hasError()) {
-                    cb(jsonError(500, "Internal error"));
+                    cb(makeErrorResponse(err));
                     return;
                 }
 
@@ -74,7 +74,7 @@ void ItemsController::listItems(
     ItemsService::listItems(
             [cb](const std::vector<ItemDTO>& items, const AppError& err) {
                 if (err.hasError()) {
-                    cb(jsonError(500, "Internal error"));
+                    cb(makeErrorResponse(err));
                     return;
                 }
 
@@ -116,7 +116,7 @@ void ItemsController::updateItem(
             itemId, title, description, url,
             [cb](const std::optional<ItemDTO>& item, const AppError& err) {
                 if (err.hasError()) {
-                    cb(jsonError(400, err.message));
+                    cb(makeErrorResponse(err));
                     return;
                 }
 
@@ -146,7 +146,7 @@ void ItemsController::deleteItem(
             itemId,
             [cb](bool ok, const AppError& err) {
                 if (err.hasError()) {
-                    cb(jsonError(500, "Internal error"));
+                    cb(makeErrorResponse(err));
                     return;
                 }
 

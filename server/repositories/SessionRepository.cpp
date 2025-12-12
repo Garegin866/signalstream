@@ -16,7 +16,7 @@ void SessionRepository::createSession(
                 cb(dto, AppError{});
             },
             [cb](const std::exception_ptr &eptr) {
-                cb({}, AppError{ErrorType::Database, "Database error"});
+                cb({}, AppError::Database("Database error"));
             },
             userId, token
     );
@@ -32,7 +32,7 @@ void SessionRepository::findByToken(
             "SELECT id, user_id, token FROM sessions WHERE token=$1 LIMIT 1;",
             [cb](const drogon::orm::Result &r) {
                 if (r.empty()) {
-                    cb(std::nullopt, AppError{ErrorType::NotFound, "Session not found"});
+                    cb({}, AppError::NotFound("Session not found"));
                     return;
                 }
 
@@ -44,7 +44,7 @@ void SessionRepository::findByToken(
                 cb(dto, AppError{});
             },
             [cb](const std::exception_ptr&) {
-                cb(std::nullopt, AppError{ErrorType::Database, "Database error"});
+                cb({}, AppError::Database("Database error"));
             },
             token
     );
@@ -61,7 +61,7 @@ void SessionRepository::deleteByToken(
                 cb(true, AppError{});
             },
             [cb](const std::exception_ptr&) {
-                cb(false, AppError{ErrorType::Database, "Database error"});
+                cb(false, AppError::Database("Database error"));
             },
             token
     );

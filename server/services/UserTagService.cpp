@@ -18,7 +18,7 @@ void UserTagService::attachTag(
                     return;
                 }
                 if (!tag.has_value()) {
-                    cb(AppError{ErrorType::NotFound, "Tag not found"});
+                    cb(AppError::NotFound("Tag not found"));
                     return;
                 }
 

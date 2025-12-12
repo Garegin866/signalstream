@@ -32,7 +32,7 @@ void ItemsRepository::getItemById(
                 cb(dto, AppError{});
             },
             [cb](const std::exception_ptr&) {
-                cb(std::nullopt, AppError{ErrorType::Database, "Database error"});
+                cb({}, AppError::Database("Database error"));
             },
             itemId
     );
@@ -53,7 +53,7 @@ void ItemsRepository::updateItem(
             "RETURNING id, title, description, url;",
             [cb](const drogon::orm::Result& r) {
                 if (r.empty()) {
-                    cb(std::nullopt, AppError{ErrorType::NotFound, "Item not found"});
+                    cb({}, AppError::NotFound("Item not found"));
                     return;
                 }
 
@@ -66,7 +66,7 @@ void ItemsRepository::updateItem(
                 cb(dto, AppError{});
             },
             [cb](const std::exception_ptr&) {
-                cb(std::nullopt, AppError{ErrorType::Database, "Database error"});
+                cb({}, AppError::Database("Database error"));
             },
             itemId, title, description, url
     );
@@ -83,7 +83,7 @@ void ItemsRepository::deleteItem(
                 cb(true, AppError{});
             },
             [cb](const std::exception_ptr&) {
-                cb(false, AppError{ErrorType::Database, "Failed to delete item"});
+                cb(false, AppError::Database("Failed to delete item"));
             },
             itemId
     );
@@ -111,7 +111,7 @@ void ItemsRepository::listAll(
                 cb(items, AppError{});
             },
             [cb](const std::exception_ptr&) {
-                cb({}, AppError{ErrorType::Database, "Database error"});
+                cb({}, AppError::Database("Database error"));
             }
     );
 }
@@ -135,7 +135,7 @@ void ItemsRepository::createItem(
                 cb(dto, AppError{});
             },
             [cb](const std::exception_ptr& eptr) {
-                cb({}, AppError{ErrorType::Database, "Failed to create item"});
+                cb({}, AppError::Database("Failed to create item"));
             },
             title, description, url
     );
@@ -168,7 +168,7 @@ void ItemsRepository::getItemsByTagIds(
                 cb(items, AppError{});
             },
             [cb](const std::exception_ptr&) {
-                cb({}, AppError{ErrorType::Database, "Database error"});
+                cb({}, AppError::Database("Database error"));
             },
             arr
     );
