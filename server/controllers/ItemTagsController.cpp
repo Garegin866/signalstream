@@ -22,7 +22,7 @@ void ItemTagsController::attachTag(
             [cb](bool ok, const AppError& err) {
                 Json::Value r;
                 if (err.hasError()) {
-                    cb(jsonError(400, "Invalid tagId"));
+                    cb(makeErrorResponse(err));
                     return;
                 }
 
@@ -41,7 +41,7 @@ void ItemTagsController::listTags(
             itemId,
             [cb](const std::vector<TagDTO>& tags, const AppError& err) {
                 if (err.hasError()) {
-                    cb(jsonError(500, "Internal error"));
+                    cb(makeErrorResponse(err));
                     return;
                 }
 
@@ -71,12 +71,12 @@ void ItemTagsController::removeTag(
             itemId,
             tagId,
             [cb](bool ok, const AppError& err) {
-                Json::Value r;
                 if (err.hasError()) {
-                    cb(jsonError(400, "Invalid tagId"));
+                    cb(makeErrorResponse(err));
                     return;
                 }
 
+                Json::Value r;
                 r["removed"] = ok;
                 cb(jsonOK(r));
             }

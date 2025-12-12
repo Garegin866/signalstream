@@ -21,12 +21,12 @@ void TagsRepository::createTag(
                 } catch (const drogon::orm::DrogonDbException &e) {
                     std::string msg = e.base().what();
                     if (msg.find("duplicate key") != std::string::npos) {
-                        cb({}, AppError{ErrorType::Duplicate, "Tag already exists"});
+                        cb({}, AppError::Duplicate("Tag already exists"));
                         return;
                     }
-                    cb({}, AppError{ErrorType::Database, "Database error"});
+                    cb({}, AppError::Database("Database error"));
                 } catch (...) {
-                    cb({}, AppError{ErrorType::NotFound, "Internal error"});
+                    cb({}, AppError::NotFound("Internal error"));
                 }
             },
             name
@@ -57,9 +57,9 @@ void TagsRepository::listTags(
                 try {
                     if (eptr) std::rethrow_exception(eptr);
                 } catch (const drogon::orm::DrogonDbException &) {
-                    cb({}, AppError{ErrorType::Database, "Database error"});
+                    cb({}, AppError::Database("Database error"));
                 } catch (...) {
-                    cb({}, AppError{ErrorType::NotFound, "Internal error"});
+                    cb({}, AppError::NotFound("Internal error"));
                 }
             }
     );
@@ -74,7 +74,7 @@ void TagsRepository::findById(
             "SELECT id, name FROM tags WHERE id=$1 LIMIT 1;",
             [cb](const drogon::orm::Result &r) {
                 if (r.empty()) {
-                    cb(std::nullopt, AppError{ErrorType::NotFound, "Tag not found"});
+                    cb({}, AppError::NotFound("Tag not found"));
                     return;
                 }
 
@@ -84,7 +84,7 @@ void TagsRepository::findById(
                 cb(dto, AppError{});
             },
             [cb](const std::exception_ptr&) {
-                cb(std::nullopt, AppError{ErrorType::Database, "Database error"});
+                cb({}, AppError::Database("Database error"));
             },
             tagId
     );

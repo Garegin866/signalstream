@@ -14,16 +14,16 @@ static AppError validateItemFields(
         const std::string& url
 ) {
     if (isEmpty(title)) {
-        return AppError{ErrorType::Validation, "Title is required"};
+        return AppError::Validation("Title is required");
     }
     if (title.size() > 200) {
-        return AppError{ErrorType::Validation, "Title is too long"};
+        return AppError::Validation("Title is too long");
     }
     if (description.size() > 2000) {
-        return AppError{ErrorType::Validation, "Description is too long"};
+        return AppError::Validation("Description is too long");
     }
     if (url.size() > 500) {
-        return AppError{ErrorType::Validation, "URL is too long"};
+        return AppError::Validation("URL is too long");
     }
     return AppError{}; // OK
 }

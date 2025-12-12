@@ -24,3 +24,12 @@ inline HttpResponsePtr jsonError(int code, const std::string &msg) {
     resp->setStatusCode((HttpStatusCode)code);
     return resp;
 }
+
+inline drogon::HttpResponsePtr makeErrorResponse(const AppError& err) {
+    Json::Value json;
+    json["error"] = err.message;
+
+    auto resp = drogon::HttpResponse::newHttpJsonResponse(json);
+    resp->setStatusCode(toHttpStatus(err));
+    return resp;
+}

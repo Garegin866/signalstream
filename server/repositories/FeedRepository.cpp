@@ -45,7 +45,7 @@ void FeedRepository::getFeedForUser(
                 cb(result, AppError{});
             },
             [cb](const std::exception_ptr&) {
-                cb({}, AppError{ErrorType::Database, "Database error"});
+                cb({}, AppError::Database("Database error"));
             },
             userId
     );

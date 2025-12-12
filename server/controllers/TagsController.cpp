@@ -13,16 +13,9 @@ void TagsController::listTags(
 ) {
     TagsService::listTags(
             [callback](const std::vector<TagDTO> &tags, const AppError &err) {
-                if (err.type != ErrorType::None) {
-                    // Error mapping
-                    switch (err.type) {
-                        case ErrorType::Database:
-                            callback(jsonError(500, err.message));
-                            return;
-                        default:
-                            callback(jsonError(500, "Internal error"));
-                            return;
-                    }
+                if (err.hasError()) {
+                    callback(makeErrorResponse(err));
+                    return;
                 }
 
                 Json::Value body(Json::objectValue);
@@ -57,28 +50,16 @@ void TagsController::createTag(
     TagsService::createTag(
             name,
             [callback](const TagDTO &dto, const AppError &err) {
-                if (err.type == ErrorType::None) {
-                    Json::Value body(Json::objectValue);
-                    body["id"] = dto.id;
-                    body["name"] = dto.name;
-                    callback(jsonCreated(body));
+                if (err.hasError()) {
+                    callback(makeErrorResponse(err));
                     return;
                 }
 
-                switch (err.type) {
-                    case ErrorType::Validation:
-                        callback(jsonError(400, err.message));
-                        return;
-                    case ErrorType::Duplicate:
-                        callback(jsonError(400, err.message));
-                        return;
-                    case ErrorType::Database:
-                        callback(jsonError(500, err.message));
-                        return;
-                    default:
-                        callback(jsonError(500, "Internal error"));
-                        return;
-                }
+                Json::Value body(Json::objectValue);
+                body["id"] = dto.id;
+                body["name"] = dto.name;
+                callback(jsonCreated(body));
+                return;
             }
     );
 }

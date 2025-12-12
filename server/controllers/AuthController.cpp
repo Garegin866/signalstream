@@ -24,13 +24,8 @@ void AuthController::registerUser(
             email,
             password,
             [callback](const UserDTO &user, const AppError &err) {
-                if (err.type != ErrorType::None) {
-                    if (err.type == ErrorType::Duplicate)
-                        callback(jsonError(400, err.message));
-                    else if (err.type == ErrorType::Validation)
-                        callback(jsonError(400, err.message));
-                    else
-                        callback(jsonError(500, err.message));
+                if (err.hasError()) {
+                    callback(makeErrorResponse(err));
                     return;
                 }
 
@@ -60,13 +55,8 @@ void AuthController::loginUser(
             email,
             password,
             [callback](const SessionDTO &session, const AppError &err) {
-                if (err.type != ErrorType::None) {
-                    if (err.type == ErrorType::Unauthorized)
-                        callback(jsonError(401, err.message));
-                    else if (err.type == ErrorType::Validation)
-                        callback(jsonError(400, err.message));
-                    else
-                        callback(jsonError(500, err.message));
+                if (err.hasError()) {
+                    callback(makeErrorResponse(err));
                     return;
                 }
 
@@ -94,7 +84,7 @@ void AuthController::me(
             token,
             [callback](const UserDTO& user, const AppError& err) {
                 if (err.hasError()) {
-                    callback(jsonError(401, "Unauthorized"));
+                    callback(makeErrorResponse(err));
                     return;
                 }
 
@@ -123,7 +113,7 @@ void AuthController::logout(
             token,
             [callback](const AppError& err) {
                 if (err.hasError()) {
-                    callback(jsonError(500, "Internal error"));
+                    callback(makeErrorResponse(err));
                     return;
                 }
 

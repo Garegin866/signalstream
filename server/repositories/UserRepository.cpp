@@ -20,12 +20,12 @@ void UserRepository::createUser(
                 } catch (const drogon::orm::DrogonDbException &e) {
                     std::string msg = e.base().what();
                     if (msg.find("duplicate key") != std::string::npos) {
-                        cb({}, AppError{ErrorType::Duplicate, "Email already exists"});
+                        cb({}, AppError::Duplicate("Email already exists"));
                         return;
                     }
-                    cb({}, AppError{ErrorType::Database, "Database error"});
+                    cb({}, AppError::Database("Database error"));
                 } catch (...) {
-                    cb({}, AppError{ErrorType::NotFound, "Internal error"});
+                    cb({}, AppError::NotFound("Internal error"));
                 }
             },
             email, passwordHash
@@ -51,7 +51,7 @@ void UserRepository::findByEmail(
                 cb(dto, r[0]["password_hash"].as<std::string>(), AppError{});
             },
             [cb](const std::exception_ptr &eptr) {
-                cb(std::nullopt, "", AppError{ErrorType::Database, "Database error"});
+                cb({}, "", AppError::Database("Database error"));
             },
             email
     );
@@ -66,7 +66,7 @@ void UserRepository::findById(
             "SELECT id, email FROM users WHERE id=$1 LIMIT 1;",
             [cb](const drogon::orm::Result &r) {
                 if (r.empty()) {
-                    cb(std::nullopt, AppError{ErrorType::NotFound, "User not found"});
+                    cb({}, AppError::NotFound("User not found"));
                     return;
                 }
 
@@ -77,7 +77,7 @@ void UserRepository::findById(
                 cb(dto, AppError{});
             },
             [cb](const std::exception_ptr&) {
-                cb(std::nullopt, AppError{ErrorType::Database, "Database error"});
+                cb({}, AppError::Database("Database error"));
             },
             userId
     );

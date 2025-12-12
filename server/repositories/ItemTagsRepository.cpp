@@ -20,10 +20,10 @@ void ItemTagsRepository::attachTagToItem(
                 } catch (const std::exception &e) {
                     std::string msg = e.what();
                     if (msg.find("duplicate key") != std::string::npos) {
-                        cb(false, AppError{ErrorType::Duplicate, "Tag already attached"});
+                        cb(false, AppError::Duplicate("Tag already attached"));
                         return;
                     }
-                    cb(false, AppError{ErrorType::Database, "Database error"});
+                    cb({}, AppError::Database("Database error"));
                 }
             },
             itemId, tagId
@@ -59,7 +59,7 @@ void ItemTagsRepository::listTagsForItem(
                 cb(tags, AppError{});
             },
             [cb](const std::exception_ptr&) {
-                cb({}, AppError{ErrorType::Database, "Database error"});
+                cb({}, AppError::Database("Database error"));
             },
             itemId
     );
@@ -94,7 +94,7 @@ void ItemTagsRepository::listItemsForTag(
                 cb(items, AppError{});
             },
             [cb](const std::exception_ptr&) {
-                cb({}, AppError{ErrorType::Database, "Database error"});
+                cb({}, AppError::Database("Database error"));
             },
             tagId
     );
@@ -116,7 +116,7 @@ void ItemTagsRepository::removeTagFromItem(
                 cb(true, AppError{});
             },
             [cb](const std::exception_ptr&) {
-                cb(false, AppError{ErrorType::Database, "Database error"});
+                cb(false, AppError::Database("Database error"));
             },
             itemId, tagId
     );
