@@ -1,5 +1,7 @@
 #include "FeedRepository.h"
 
+#include "core/Constants.h"
+
 void FeedRepository::getFeedForUser(
         drogon::orm::DbClientPtr client,
         int userId,
@@ -17,22 +19,22 @@ void FeedRepository::getFeedForUser(
                 std::unordered_map<int, FeedItemDTO> items;
 
                 for (const auto& row : r) {
-                    int itemId = row["item_id"].as<int>();
+                    int itemId = row[Const::COL_ITEM_ID].as<int>();
 
                     // Create item if not exists
                     if (!items.count(itemId)) {
                         FeedItemDTO dto;
                         dto.id = itemId;
-                        dto.title = row["title"].as<std::string>();
-                        dto.description = row["description"].as<std::string>();
-                        dto.url = row["url"].as<std::string>();
+                        dto.title = row[Const::COL_TITLE].as<std::string>();
+                        dto.description = row[Const::COL_DESCRIPTION].as<std::string>();
+                        dto.url = row[Const::COL_URL].as<std::string>();
                         items[itemId] = dto;
                     }
 
                     // Add tag
                     TagDTO tag;
-                    tag.id = row["tag_id"].as<int>();
-                    tag.name = row["tag_name"].as<std::string>();
+                    tag.id = row[Const::COL_TAG_ID].as<int>();
+                    tag.name = row[Const::COL_TAG_NAME].as<std::string>();
                     items[itemId].tags.push_back(tag);
                 }
 

@@ -14,17 +14,17 @@ void UserTagController::attach(
     REQUIRE_AUTH_USER(req, callback, user);
 
     auto json = req->getJsonObject();
-    if (!json || !json->isMember("tagId")) {
+    if (!json || !json->isMember(Const::JSON_TAG_ID)) {
         callback(jsonError(400, "tagId required"));
         return;
     }
 
-    if (!json->isMember("tagId") || !(*json)["tagId"].isInt()) {
+    if (!json->isMember(Const::JSON_TAG_ID) || !(*json)[Const::JSON_TAG_ID].isInt()) {
         callback(jsonError(400, "tagId must be an integer"));
         return;
     }
 
-    int tagId = (*json)["tagId"].asInt();
+    int tagId = (*json)[Const::JSON_TAG_ID].asInt();
 
     UserTagService::attachTag(
             user.id,
@@ -36,7 +36,7 @@ void UserTagController::attach(
                 }
 
                 Json::Value ok;
-                ok["ok"] = true;
+                ok[Const::JSON_OK] = true;
 
                 callback(jsonOK(ok));
             }
@@ -60,13 +60,13 @@ void UserTagController::list(
                 Json::Value arr(Json::arrayValue);
                 for (const auto &tag : tags) {
                     Json::Value item;
-                    item["id"] = tag.id;
-                    item["name"] = tag.name;
+                    item[Const::JSON_ID] = tag.id;
+                    item[Const::JSON_NAME] = tag.name;
                     arr.append(item);
                 }
 
                 Json::Value res;
-                res["tags"] = arr;
+                res[Const::JSON_TAGS] = arr;
 
                 callback(jsonOK(res));
             }

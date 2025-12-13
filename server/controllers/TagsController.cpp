@@ -23,12 +23,12 @@ void TagsController::listTags(
 
                 for (const auto &t : tags) {
                     Json::Value obj(Json::objectValue);
-                    obj["id"] = t.id;
-                    obj["name"] = t.name;
+                    obj[Const::JSON_ID] = t.id;
+                    obj[Const::JSON_NAME] = t.name;
                     arr.append(obj);
                 }
 
-                body["tags"] = arr;
+                body[Const::JSON_TAGS] = arr;
 
                 callback(jsonOK(body));
             }
@@ -40,12 +40,12 @@ void TagsController::createTag(
         std::function<void(const HttpResponsePtr&)> &&callback
 ) {
     auto json = req->getJsonObject();
-    if (!json || !json->isMember("name")) {
+    if (!json || !json->isMember(Const::JSON_NAME)) {
         callback(jsonError(400, "name required"));
         return;
     }
 
-    auto name = (*json)["name"].asString();
+    auto name = (*json)[Const::JSON_NAME].asString();
 
     TagsService::createTag(
             name,
@@ -56,8 +56,8 @@ void TagsController::createTag(
                 }
 
                 Json::Value body(Json::objectValue);
-                body["id"] = dto.id;
-                body["name"] = dto.name;
+                body[Const::JSON_ID] = dto.id;
+                body[Const::JSON_NAME] = dto.name;
                 callback(jsonCreated(body));
                 return;
             }

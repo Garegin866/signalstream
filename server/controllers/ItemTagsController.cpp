@@ -9,12 +9,12 @@ void ItemTagsController::attachTag(
         int itemId
 ) {
     auto json = req->getJsonObject();
-    if (!json || !json->isMember("tagId")) {
+    if (!json || !json->isMember(Const::JSON_TAG_ID)) {
         cb(jsonError(400, "tagId required"));
         return;
     }
 
-    int tagId = (*json)["tagId"].asInt();
+    int tagId = (*json)[Const::JSON_TAG_ID].asInt();
 
     ItemTagService::attachTag(
             itemId,
@@ -26,7 +26,7 @@ void ItemTagsController::attachTag(
                     return;
                 }
 
-                r["attached"] = ok;
+                r[Const::JSON_ATTACHED] = ok;
                 cb(jsonOK(r));
             }
     );
@@ -48,13 +48,13 @@ void ItemTagsController::listTags(
                 Json::Value arr(Json::arrayValue);
                 for (const auto& t : tags) {
                     Json::Value v;
-                    v["id"] = t.id;
-                    v["name"] = t.name;
+                    v[Const::JSON_ID] = t.id;
+                    v[Const::JSON_NAME] = t.name;
                     arr.append(v);
                 }
 
                 Json::Value r;
-                r["tags"] = arr;
+                r[Const::JSON_TAGS] = arr;
 
                 cb(jsonOK(r));
             }
@@ -77,7 +77,7 @@ void ItemTagsController::removeTag(
                 }
 
                 Json::Value r;
-                r["removed"] = ok;
+                r[Const::JSON_REMOVED] = ok;
                 cb(jsonOK(r));
             }
     );

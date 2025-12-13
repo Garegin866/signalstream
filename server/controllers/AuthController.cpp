@@ -18,8 +18,8 @@ void AuthController::registerUser(
         return;
     }
 
-    auto email = (*json)["email"].asString();
-    auto password = (*json)["password"].asString();
+    auto email = (*json)[Const::JSON_EMAIL].asString();
+    auto password = (*json)[Const::JSON_PASSWORD].asString();
 
     AuthService::registerUser(
             email,
@@ -31,8 +31,8 @@ void AuthController::registerUser(
                 }
 
                 Json::Value body;
-                body["id"] = user.id;
-                body["email"] = user.email;
+                body[Const::JSON_ID] = user.id;
+                body[Const::JSON_EMAIL] = user.email;
 
                 callback(jsonCreated(body));
             }
@@ -49,8 +49,8 @@ void AuthController::loginUser(
         return;
     }
 
-    auto email = (*json)["email"].asString();
-    auto password = (*json)["password"].asString();
+    auto email = (*json)[Const::JSON_EMAIL].asString();
+    auto password = (*json)[Const::JSON_PASSWORD].asString();
 
     AuthService::loginUser(
             email,
@@ -62,7 +62,7 @@ void AuthController::loginUser(
                 }
 
                 Json::Value body;
-                body["token"] = session.token;
+                body[Const::JSON_TOKEN] = session.token;
 
                 callback(jsonOK(body));
             }
@@ -76,8 +76,8 @@ void AuthController::me(
     REQUIRE_AUTH_USER(req, callback, user);
 
     Json::Value body;
-    body["id"] = user.id;
-    body["email"] = user.email;
+    body[Const::JSON_ID] = user.id;
+    body[Const::JSON_EMAIL] = user.email;
 
     callback(jsonOK(body));
 }
@@ -97,7 +97,7 @@ void AuthController::logout(
                 }
 
                 Json::Value ok;
-                ok["ok"] = true;
+                ok[Const::JSON_OK] = true;
 
                 callback(jsonOK(ok));
             }

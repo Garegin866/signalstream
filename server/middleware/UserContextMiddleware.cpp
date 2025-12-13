@@ -2,6 +2,8 @@
 #include "../repositories/UserRepository.h"
 #include "../core/Error.h"
 #include "../core/Response.h"
+#include "../core/Constants.h"
+
 #include <drogon/drogon.h>
 
 void UserContextMiddleware::doFilter(
@@ -12,12 +14,12 @@ void UserContextMiddleware::doFilter(
 
     // Expect userId from TokenMiddleware
     auto attributes = req->attributes();
-    if (!attributes->find("userId")) {
+    if (!attributes->find(Const::ATTR_USER_ID)) {
         fcb(makeErrorResponse(AppError::Unauthorized("Missing userId attribute")));
         return;
     }
 
-    int userId = req->attributes()->get<int>("userId");
+    int userId = req->attributes()->get<int>(Const::ATTR_USER_ID);
     auto client = drogon::app().getDbClient();
 
     UserRepository::findById(
@@ -38,7 +40,7 @@ void UserContextMiddleware::doFilter(
                 }
 
                 // Inject full UserDTO into request
-                req->attributes()->insert("user", *user);
+                req->attributes()->insert(Const::ATTR_USER, *user);
 
                 // Continue the chain
                 fccb();
