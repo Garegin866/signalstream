@@ -4,6 +4,7 @@
 
 #include "services/AuthService.h"
 #include "core/Response.h"
+#include "core/RequestContextHelpers.h"
 
 using namespace drogon;
 
@@ -72,42 +73,20 @@ void AuthController::me(
         const HttpRequestPtr& req,
         std::function<void(const HttpResponsePtr&)>&& callback
 ) {
-    auto auth = req->getHeader("Authorization");
-    if (auth.size() < 8 || auth.substr(0,7) != "Bearer ") {
-        callback(jsonError(401, "Unauthorized"));
-        return;
-    }
+    REQUIRE_AUTH_USER(req, callback, user);
 
-    std::string token = auth.substr(7);
+    Json::Value body;
+    body["id"] = user.id;
+    body["email"] = user.email;
 
-    AuthService::me(
-            token,
-            [callback](const UserDTO& user, const AppError& err) {
-                if (err.hasError()) {
-                    callback(makeErrorResponse(err));
-                    return;
-                }
-
-                Json::Value body;
-                body["id"] = user.id;
-                body["email"] = user.email;
-
-                callback(jsonOK(body));
-            }
-    );
+    callback(jsonOK(body));
 }
 
 void AuthController::logout(
         const HttpRequestPtr &req,
         std::function<void(const HttpResponsePtr&)> &&callback
 ) {
-    auto auth = req->getHeader("Authorization");
-    if (auth.size() < 8 || auth.substr(0,7) != "Bearer ") {
-        callback(jsonError(401, "Unauthorized"));
-        return;
-    }
-
-    std::string token = auth.substr(7);
+    REQUIRE_AUTH_USER_WITH_TOKEN(req, callback, user, token);
 
     AuthService::logout(
             token,

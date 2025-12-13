@@ -35,11 +35,17 @@ set(CONTROLLERS
         controllers/ItemsController.cpp
 )
 
+set(MIDDLEWARE
+        middleware/TokenMiddleware.cpp
+        middleware/UserContextMiddleware.cpp
+)
+
 add_executable(${PROJECT_NAME}
         main.cpp
         ${REPOSITORIES}
         ${SERVICES}
         ${CONTROLLERS}
+        ${MIDDLEWARE}
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE

@@ -20,5 +20,9 @@
       "is_fast": false,
       "client_encoding": "utf8"
     }
+  ],
+  "filters": [
+    "TokenMiddleware",
+    "UserContextMiddleware"
   ]
 }

@@ -11,6 +11,7 @@ Makefile
 
 # Conan & build outputs
 build/
+conan/
 conan.lock
 
 # OS
