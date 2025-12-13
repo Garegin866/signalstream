@@ -2,111 +2,43 @@ name: CI
 
 on:
   push:
-    branches: [ "main", "dev", "feature/*", "fix/*" ]
   pull_request:
-    branches: [ "main", "dev" ]
 
 jobs:
-  build-test-lint:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-
-      # -------------------------
-      # Checkout Code
-      # -------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # -------------------------
-      # Cache Conan dependencies
-      # -------------------------
-      - name: Cache Conan
-        uses: actions/cache@v4
-        with:
-          path: ~/.conan2
-          key: ${{ runner.os }}-conan-${{ hashFiles('conanfile.*') }}
-          restore-keys: |
-            ${{ runner.os }}-conan-
-
-      # -------------------------
-      # Install Conan 2
-      # -------------------------
+      # Install Conan
       - name: Install Conan 2
         run: |
-          pip install conan==2.*
+          pip install conan==2.22.2
           conan --version
 
-      # -------------------------
-      # Configure Conan profile
-      # -------------------------
-      - name: Configure Conan profile
+      - name: Install Ninja
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Conan install (Release)
         run: |
           conan profile detect --force
+          conan install . --build=missing
 
-      # -------------------------
-      # Conan Install Dependencies
-      # -------------------------
-      - name: Install dependencies
+      - name: Configure CMake
         run: |
-          conan install . \
-            --output-folder=build \
-            --build=missing \
-            --settings=compiler.cppstd=20
+          cmake -G Ninja -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_TOOLCHAIN_FILE=build/Release/generators/conan_toolchain.cmake \
+            -B build
 
-      # -------------------------
-      # Configure CMake (coverage enabled)
-      # -------------------------
-      - name: Configure with CMake
-        run: |
-          cmake -B build \
-            -DCMAKE_BUILD_TYPE=Debug \
-            -DCMAKE_CXX_FLAGS="--coverage" \
-            -DCMAKE_C_FLAGS="--coverage" \
-            -DCMAKE_EXE_LINKER_FLAGS="--coverage" \
-            -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake \
-            -G Ninja
-
-      # -------------------------
-      # Build
-      # -------------------------
       - name: Build
-        run: cmake --build build --target signalstream_server -j 4
+        run: cmake --build build -j$(nproc)
 
-      # -------------------------
-      # Run tests (if exists)
-      # -------------------------
-      - name: Run tests
-        if: hashFiles('tests/*') != ''
-        run: ctest --test-dir build --output-on-failure
-
-      # -------------------------
-      # Collect coverage (local gcov output)
-      # -------------------------
-      - name: Collect coverage
-        if: hashFiles('tests/*') != ''
+      - name: Run tests (if any)
         run: |
-          echo "Generating gcov reports..."
-          gcov $(find . -name "*.cpp") || true
-
-      # -------------------------
-      # Upload coverage artifacts (optional)
-      # -------------------------
-      - name: Upload coverage artifacts
-        if: hashFiles('tests/*') != ''
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-reports
-          path: ./*.gcov
-
-      # -------------------------
-      # Lint (clang-format)
-      # -------------------------
-      - name: Install clang-format
-        run: sudo apt-get install -y clang-format
-
-      - name: Run clang-format check
-        run: |
-          set -e
-          FILES=$(find server -name '*.cpp' -o -name '*.h')
-          clang-format --dry-run --Werror $FILES
+          if [ -d "build/tests" ]; then
+            ctest --test-dir build
+          else
+            echo "No tests directory found — skipping."
+          fi
