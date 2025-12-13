@@ -25,8 +25,10 @@ jobs:
           restore-keys: |
             conan-${{ runner.os }}-
 
-      - name: Install Conan
-        uses: turtlebrowser/get-conan@v2
+      - name: Install Conan 2
+        run: |
+          pip install conan==2.22.2
+          conan --version
 
       - name: Conan profile detect
         run: conan profile detect --force
