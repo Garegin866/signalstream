@@ -1,0 +1,112 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main", "dev", "feature/*", "fix/*" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+
+jobs:
+  build-test-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # -------------------------
+      # Checkout Code
+      # -------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # -------------------------
+      # Cache Conan dependencies
+      # -------------------------
+      - name: Cache Conan
+        uses: actions/cache@v4
+        with:
+          path: ~/.conan2
+          key: ${{ runner.os }}-conan-${{ hashFiles('conanfile.*') }}
+          restore-keys: |
+            ${{ runner.os }}-conan-
+
+      # -------------------------
+      # Install Conan 2
+      # -------------------------
+      - name: Install Conan 2
+        run: |
+          pip install conan==2.*
+          conan --version
+
+      # -------------------------
+      # Configure Conan profile
+      # -------------------------
+      - name: Configure Conan profile
+        run: |
+          conan profile detect --force
+
+      # -------------------------
+      # Conan Install Dependencies
+      # -------------------------
+      - name: Install dependencies
+        run: |
+          conan install . \
+            --output-folder=build \
+            --build=missing \
+            --settings=compiler.cppstd=20
+
+      # -------------------------
+      # Configure CMake (coverage enabled)
+      # -------------------------
+      - name: Configure with CMake
+        run: |
+          cmake -B build \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_CXX_FLAGS="--coverage" \
+            -DCMAKE_C_FLAGS="--coverage" \
+            -DCMAKE_EXE_LINKER_FLAGS="--coverage" \
+            -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake \
+            -G Ninja
+
+      # -------------------------
+      # Build
+      # -------------------------
+      - name: Build
+        run: cmake --build build --target signalstream_server -j 4
+
+      # -------------------------
+      # Run tests (if exists)
+      # -------------------------
+      - name: Run tests
+        if: hashFiles('tests/*') != ''
+        run: ctest --test-dir build --output-on-failure
+
+      # -------------------------
+      # Collect coverage (local gcov output)
+      # -------------------------
+      - name: Collect coverage
+        if: hashFiles('tests/*') != ''
+        run: |
+          echo "Generating gcov reports..."
+          gcov $(find . -name "*.cpp") || true
+
+      # -------------------------
+      # Upload coverage artifacts (optional)
+      # -------------------------
+      - name: Upload coverage artifacts
+        if: hashFiles('tests/*') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: ./*.gcov
+
+      # -------------------------
+      # Lint (clang-format)
+      # -------------------------
+      - name: Install clang-format
+        run: sudo apt-get install -y clang-format
+
+      - name: Run clang-format check
+        run: |
+          set -e
+          FILES=$(find server -name '*.cpp' -o -name '*.h')
+          clang-format --dry-run --Werror $FILES
