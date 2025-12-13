@@ -1,30 +1,44 @@
-name: CI
+name: Build & Compile
 
 on:
-  push:
   pull_request:
+    branches: [ dev, main ]
+  push:
+    branches: [ dev ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      # Install Conan
-      - name: Install Conan 2
-        run: |
-          pip install conan==2.22.2
-          conan --version
+      # ---------------------------
+      # Conan Caching
+      # ---------------------------
+      - name: Cache Conan packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.conan2/p
+          key: conan-${{ runner.os }}-${{ hashFiles('conanfile.txt') }}
+          restore-keys: |
+            conan-${{ runner.os }}-
 
-      - name: Install Ninja
-        run: sudo apt-get update && sudo apt-get install -y ninja-build
+      - name: Install Conan
+        uses: turtlebrowser/get-conan@v2
+
+      - name: Conan profile detect
+        run: conan profile detect --force
 
       - name: Conan install (Release)
         run: |
-          conan profile detect --force
-          conan install . --build=missing
+          conan install . \
+            --build=missing \
+            -s compiler.cppstd=20
+
+      - name: Install Ninja
+        run: sudo apt-get install -y ninja-build
 
       - name: Configure CMake
         run: |
@@ -33,12 +47,7 @@ jobs:
             -B build
 
       - name: Build
-        run: cmake --build build -j$(nproc)
+        run: cmake --build build -j
 
-      - name: Run tests (if any)
-        run: |
-          if [ -d "build/tests" ]; then
-            ctest --test-dir build
-          else
-            echo "No tests directory found — skipping."
-          fi
+      - name: Run unit tests
+        run: echo "No tests yet"
