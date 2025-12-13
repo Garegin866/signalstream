@@ -8,14 +8,14 @@ void ItemsController::createItem(
         std::function<void(const drogon::HttpResponsePtr&)>&& cb
 ) {
     auto json = req->getJsonObject();
-    if (!json || !json->isMember("title")) {
+    if (!json || !json->isMember(Const::JSON_TITLE)) {
         cb(jsonError(400, "title required"));
         return;
     }
 
-    std::string title = (*json)["title"].asString();
-    std::string description = json->get("description", "").asString();
-    std::string url = json->get("url", "").asString();
+    std::string title = (*json)[Const::JSON_TITLE].asString();
+    std::string description = json->get(Const::JSON_DESC, "").asString();
+    std::string url = json->get(Const::JSON_URL, "").asString();
 
     ItemsService::createItem(
             title, description, url,
@@ -26,10 +26,10 @@ void ItemsController::createItem(
                 }
 
                 Json::Value data;
-                data["id"] = item.id;
-                data["title"] = item.title;
-                data["description"] = item.description;
-                data["url"] = item.url;
+                data[Const::JSON_ID] = item.id;
+                data[Const::JSON_TITLE] = item.title;
+                data[Const::JSON_DESC] = item.description;
+                data[Const::JSON_URL] = item.url;
 
                 cb(jsonOK(data));
             }
@@ -56,10 +56,10 @@ void ItemsController::getItem(
                 }
 
                 Json::Value data;
-                data["id"] = item->id;
-                data["title"] = item->title;
-                data["description"] = item->description;
-                data["url"] = item->url;
+                data[Const::JSON_ID] = item->id;
+                data[Const::JSON_TITLE] = item->title;
+                data[Const::JSON_DESC] = item->description;
+                data[Const::JSON_URL] = item->url;
 
                 cb(jsonOK(data));
             }
@@ -81,15 +81,15 @@ void ItemsController::listItems(
                 Json::Value arr(Json::arrayValue);
                 for (const auto& item : items) {
                     Json::Value v;
-                    v["id"] = item.id;
-                    v["title"] = item.title;
-                    v["description"] = item.description;
-                    v["url"] = item.url;
+                    v[Const::JSON_ID] = item.id;
+                    v[Const::JSON_TITLE] = item.title;
+                    v[Const::JSON_DESC] = item.description;
+                    v[Const::JSON_URL] = item.url;
                     arr.append(v);
                 }
 
                 Json::Value data;
-                data["items"] = arr;
+                data[Const::JSON_ITEMS] = arr;
 
                 cb(jsonOK(data));
             }
@@ -108,9 +108,9 @@ void ItemsController::updateItem(
         return;
     }
 
-    std::string title = json->get("title", "").asString();
-    std::string description = json->get("description", "").asString();
-    std::string url = json->get("url", "").asString();
+    std::string title = json->get(Const::JSON_TITLE, "").asString();
+    std::string description = json->get(Const::JSON_DESC, "").asString();
+    std::string url = json->get(Const::JSON_URL, "").asString();
 
     ItemsService::updateItem(
             itemId, title, description, url,
@@ -126,10 +126,10 @@ void ItemsController::updateItem(
                 }
 
                 Json::Value r;
-                r["id"] = item->id;
-                r["title"] = item->title;
-                r["description"] = item->description;
-                r["url"] = item->url;
+                r[Const::JSON_ID] = item->id;
+                r[Const::JSON_TITLE] = item->title;
+                r[Const::JSON_DESC] = item->description;
+                r[Const::JSON_URL] = item->url;
 
                 cb(jsonOK(r));
             }
@@ -151,7 +151,7 @@ void ItemsController::deleteItem(
                 }
 
                 Json::Value r;
-                r["deleted"] = ok;
+                r[Const::JSON_DELETED] = ok;
 
                 cb(jsonOK(r));
             }

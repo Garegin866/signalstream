@@ -18,20 +18,20 @@ void FeedController::getFeed(
 
                 for (const auto& item : items) {
                     Json::Value v;
-                    v["id"] = item.id;
-                    v["title"] = item.title;
-                    v["description"] = item.description;
-                    v["url"] = item.url;
+                    v[Const::JSON_ID] = item.id;
+                    v[Const::JSON_TITLE] = item.title;
+                    v[Const::JSON_DESC] = item.description;
+                    v[Const::JSON_URL] = item.url;
 
                     Json::Value tags(Json::arrayValue);
                     for (const auto& t : item.tags) {
                         Json::Value tv;
-                        tv["id"] = t.id;
-                        tv["name"] = t.name;
+                        tv[Const::JSON_ID] = t.id;
+                        tv[Const::JSON_NAME] = t.name;
                         tags.append(tv);
                     }
 
-                    v["tags"] = tags;
+                    v[Const::JSON_TAGS] = tags;
                     out.append(v);
                 }
 

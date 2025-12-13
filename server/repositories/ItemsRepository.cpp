@@ -1,5 +1,7 @@
 #include "ItemsRepository.h"
 
+#include "core/Constants.h"
+
 static std::string toPgArray(const std::vector<int>& ids) {
     std::string out = "{";
     for (size_t i = 0; i < ids.size(); ++i) {
@@ -24,10 +26,10 @@ void ItemsRepository::getItemById(
                 }
 
                 ItemDTO dto;
-                dto.id = r[0]["id"].as<int>();
-                dto.title = r[0]["title"].as<std::string>();
-                dto.description = r[0]["description"].as<std::string>();
-                dto.url = r[0]["url"].as<std::string>();
+                dto.id = r[0][Const::COL_ID].as<int>();
+                dto.title = r[0][Const::COL_TITLE].as<std::string>();
+                dto.description = r[0][Const::COL_DESCRIPTION].as<std::string>();
+                dto.url = r[0][Const::COL_URL].as<std::string>();
 
                 cb(dto, AppError{});
             },
@@ -58,10 +60,10 @@ void ItemsRepository::updateItem(
                 }
 
                 ItemDTO dto;
-                dto.id = r[0]["id"].as<int>();
-                dto.title = r[0]["title"].as<std::string>();
-                dto.description = r[0]["description"].as<std::string>();
-                dto.url = r[0]["url"].as<std::string>();
+                dto.id = r[0][Const::COL_ID].as<int>();
+                dto.title = r[0][Const::COL_TITLE].as<std::string>();
+                dto.description = r[0][Const::COL_DESCRIPTION].as<std::string>();
+                dto.url = r[0][Const::COL_URL].as<std::string>();
 
                 cb(dto, AppError{});
             },
@@ -101,10 +103,10 @@ void ItemsRepository::listAll(
 
                 for (const auto& row : r) {
                     ItemDTO dto;
-                    dto.id = row["id"].as<int>();
-                    dto.title = row["title"].as<std::string>();
-                    dto.description = row["description"].as<std::string>();
-                    dto.url = row["url"].as<std::string>();
+                    dto.id = row[Const::COL_ID].as<int>();
+                    dto.title = row[Const::COL_TITLE].as<std::string>();
+                    dto.description = row[Const::COL_DESCRIPTION].as<std::string>();
+                    dto.url = row[Const::COL_URL].as<std::string>();
                     items.push_back(dto);
                 }
 
@@ -128,10 +130,10 @@ void ItemsRepository::createItem(
             "VALUES ($1, $2, $3) RETURNING id, title, description, url;",
             [cb](const drogon::orm::Result& r) {
                 ItemDTO dto;
-                dto.id = r[0]["id"].as<int>();
-                dto.title = r[0]["title"].as<std::string>();
-                dto.description = r[0]["description"].as<std::string>();
-                dto.url = r[0]["url"].as<std::string>();
+                dto.id = r[0][Const::COL_ID].as<int>();
+                dto.title = r[0][Const::COL_TITLE].as<std::string>();
+                dto.description = r[0][Const::COL_DESCRIPTION].as<std::string>();
+                dto.url = r[0][Const::COL_URL].as<std::string>();
                 cb(dto, AppError{});
             },
             [cb](const std::exception_ptr& eptr) {
@@ -160,8 +162,8 @@ void ItemsRepository::getItemsByTagIds(
 
                 for (const auto& row : r) {
                     ItemDTO dto;
-                    dto.id = row["id"].as<int>();
-                    dto.title = row["title"].as<std::string>();
+                    dto.id = row[Const::COL_ID].as<int>();
+                    dto.title = row[Const::COL_TITLE].as<std::string>();
                     items.push_back(dto);
                 }
 

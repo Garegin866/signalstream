@@ -1,6 +1,7 @@
 #include "TokenMiddleware.h"
 #include "../repositories/SessionRepository.h"
 #include "../core/Response.h"
+#include "../core/Constants.h"
 
 #include <drogon/drogon.h>
 #include <drogon/HttpAppFramework.h>
@@ -11,14 +12,14 @@ void TokenMiddleware::doFilter(
         drogon::FilterChainCallback&& fccb
 ) {
 
-    auto auth = req->getHeader("Authorization");
+    auto auth = req->getHeader(Const::HEADER_AUTHORIZATION);
 
     if (auth.empty()) {
         fcb(makeErrorResponse(AppError::Unauthorized("Missing Authorization header")));
         return;
     }
 
-    if (auth.rfind("Bearer ", 0) != 0) {
+    if (auth.rfind(Const::AUTH_BEARER_PREFIX, 0) != 0) {
         fcb(makeErrorResponse(AppError::Unauthorized("Malformed Authorization header")));
         return;
     }
@@ -47,8 +48,8 @@ void TokenMiddleware::doFilter(
                 }
 
                 // Attach userId to request context
-                req->attributes()->insert("userId", session->userId);
-                req->attributes()->insert("token", session->token);
+                req->attributes()->insert(Const::ATTR_USER_ID, session->userId);
+                req->attributes()->insert(Const::ATTR_TOKEN, session->token);
 
                 // Continue to the next middleware/controller
                 fccb();

@@ -1,5 +1,7 @@
 #include "UserRepository.h"
 
+#include "core/Constants.h"
+
 void UserRepository::createUser(
         drogon::orm::DbClientPtr client,
         const std::string &email,
@@ -10,8 +12,8 @@ void UserRepository::createUser(
             "INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id, email;",
             [cb](const drogon::orm::Result &r) {
                 UserDTO dto;
-                dto.id = r[0]["id"].as<int>();
-                dto.email = r[0]["email"].as<std::string>();
+                dto.id = r[0][Const::COL_ID].as<int>();
+                dto.email = r[0][Const::COL_EMAIL].as<std::string>();
                 cb(dto, AppError{});
             },
             [cb](const std::exception_ptr &eptr) {
@@ -46,9 +48,9 @@ void UserRepository::findByEmail(
                     return;
                 }
                 UserDTO dto;
-                dto.id = r[0]["id"].as<int>();
-                dto.email = r[0]["email"].as<std::string>();
-                cb(dto, r[0]["password_hash"].as<std::string>(), AppError{});
+                dto.id = r[0][Const::COL_ID].as<int>();
+                dto.email = r[0][Const::COL_EMAIL].as<std::string>();
+                cb(dto, r[0][Const::COL_PASSWORD_HASH].as<std::string>(), AppError{});
             },
             [cb](const std::exception_ptr &eptr) {
                 cb({}, "", AppError::Database("Database error"));
@@ -71,8 +73,8 @@ void UserRepository::findById(
                 }
 
                 UserDTO dto;
-                dto.id = r[0]["id"].as<int>();
-                dto.email = r[0]["email"].as<std::string>();
+                dto.id = r[0][Const::COL_ID].as<int>();
+                dto.email = r[0][Const::COL_EMAIL].as<std::string>();
 
                 cb(dto, AppError{});
             },

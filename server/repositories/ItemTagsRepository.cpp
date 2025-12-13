@@ -1,5 +1,7 @@
 #include "ItemTagsRepository.h"
 
+#include "core/Constants.h"
+
 // -----------------------------------------------------
 // 1. ATTACH TAG TO ITEM
 // -----------------------------------------------------
@@ -51,8 +53,8 @@ void ItemTagsRepository::listTagsForItem(
 
                 for (const auto& row : r) {
                     TagDTO dto;
-                    dto.id = row["id"].as<int>();
-                    dto.name = row["name"].as<std::string>();
+                    dto.id = row[Const::COL_ID].as<int>();
+                    dto.name = row[Const::COL_NAME].as<std::string>();
                     tags.push_back(dto);
                 }
 
@@ -86,8 +88,8 @@ void ItemTagsRepository::listItemsForTag(
 
                 for (const auto& row : r) {
                     ItemDTO dto;
-                    dto.id = row["id"].as<int>();
-                    dto.title = row["title"].as<std::string>();
+                    dto.id = row[Const::COL_ID].as<int>();
+                    dto.title = row[Const::COL_TITLE].as<std::string>();
                     items.push_back(dto);
                 }
 

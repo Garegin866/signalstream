@@ -2,6 +2,8 @@
 
 #include <drogon/orm/DbClient.h>
 
+#include "../core/Constants.h"
+
 void TagsRepository::createTag(
         drogon::orm::DbClientPtr client,
         const std::string &name,
@@ -11,8 +13,8 @@ void TagsRepository::createTag(
             "INSERT INTO tags (name) VALUES ($1) RETURNING id, name;",
             [cb](const drogon::orm::Result &r) {
                 TagDTO dto;
-                dto.id = r[0]["id"].as<int>();
-                dto.name = r[0]["name"].as<std::string>();
+                dto.id = r[0][Const::COL_ID].as<int>();
+                dto.name = r[0][Const::COL_NAME].as<std::string>();
                 cb(dto, AppError{});
             },
             [cb](const std::exception_ptr &eptr) {
@@ -45,8 +47,8 @@ void TagsRepository::listTags(
 
                 for (const auto &row : r) {
                     TagDTO dto;
-                    dto.id = row["id"].as<int>();
-                    dto.name = row["name"].as<std::string>();
+                    dto.id = row[Const::COL_ID].as<int>();
+                    dto.name = row[Const::COL_NAME].as<std::string>();
                     list.push_back(std::move(dto));
                 }
 
@@ -79,8 +81,8 @@ void TagsRepository::findById(
                 }
 
                 TagDTO dto;
-                dto.id = r[0]["id"].as<int>();
-                dto.name = r[0]["name"].as<std::string>();
+                dto.id = r[0][Const::COL_ID].as<int>();
+                dto.name = r[0][Const::COL_NAME].as<std::string>();
                 cb(dto, AppError{});
             },
             [cb](const std::exception_ptr&) {

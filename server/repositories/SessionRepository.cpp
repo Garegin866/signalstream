@@ -1,5 +1,7 @@
 #include "SessionRepository.h"
 
+#include "core/Constants.h"
+
 void SessionRepository::createSession(
         drogon::orm::DbClientPtr client,
         int userId,
@@ -10,9 +12,9 @@ void SessionRepository::createSession(
             "INSERT INTO sessions (user_id, token) VALUES ($1, $2) RETURNING id, user_id, token;",
             [cb](const drogon::orm::Result &r) {
                 SessionDTO dto;
-                dto.id = r[0]["id"].as<int>();
-                dto.userId = r[0]["user_id"].as<int>();
-                dto.token = r[0]["token"].as<std::string>();
+                dto.id = r[0][Const::COL_ID].as<int>();
+                dto.userId = r[0][Const::COL_USER_ID].as<int>();
+                dto.token = r[0][Const::COL_TOKEN].as<std::string>();
                 cb(dto, AppError{});
             },
             [cb](const std::exception_ptr &eptr) {
@@ -37,9 +39,9 @@ void SessionRepository::findByToken(
                 }
 
                 SessionDTO dto;
-                dto.id = r[0]["id"].as<int>();
-                dto.userId = r[0]["user_id"].as<int>();
-                dto.token = r[0]["token"].as<std::string>();
+                dto.id = r[0][Const::COL_ID].as<int>();
+                dto.userId = r[0][Const::COL_USER_ID].as<int>();
+                dto.token = r[0][Const::COL_TOKEN].as<std::string>();
 
                 cb(dto, AppError{});
             },

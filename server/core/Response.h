@@ -2,6 +2,8 @@
 #include <json/value.h>
 #include <drogon/HttpResponse.h>
 
+#include "Constants.h"
+
 using namespace drogon;
 
 inline HttpResponsePtr jsonOK(const Json::Value &body) {
@@ -18,7 +20,7 @@ inline HttpResponsePtr jsonCreated(const Json::Value &body) {
 
 inline HttpResponsePtr jsonError(int code, const std::string &msg) {
     Json::Value body(Json::objectValue);
-    body["error"] = msg;
+    body[Const::JSON_ERROR] = msg;
 
     auto resp = HttpResponse::newHttpJsonResponse(body);
     resp->setStatusCode((HttpStatusCode)code);
@@ -27,7 +29,7 @@ inline HttpResponsePtr jsonError(int code, const std::string &msg) {
 
 inline drogon::HttpResponsePtr makeErrorResponse(const AppError& err) {
     Json::Value json;
-    json["error"] = err.message;
+    json[Const::JSON_ERROR] = err.message;
 
     auto resp = drogon::HttpResponse::newHttpJsonResponse(json);
     resp->setStatusCode(toHttpStatus(err));
