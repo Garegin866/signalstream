@@ -38,7 +38,7 @@ void TagsController::createTag(
         const HttpRequestPtr &req,
         std::function<void(const HttpResponsePtr&)> &&callback
 ) {
-    REQUIRE_ADMIN(req, callback);
+    REQUIRE_MOD_OR_ADMIN(req, callback);
 
     auto json = req->getJsonObject();
     if (!json || !json->isMember(Const::JSON_NAME)) {
