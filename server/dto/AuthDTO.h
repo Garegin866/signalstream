@@ -3,7 +3,9 @@
 
 enum class UserRole {
     User,
+    Moderator,
     Admin,
+    Invalid
 };
 
 struct UserDTO {

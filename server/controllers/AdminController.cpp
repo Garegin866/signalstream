@@ -47,8 +47,8 @@ void AdminController::setRole(
     std::string roleStr = (*json)[Const::JSON_ROLE].asString();
 
     auto role = fromString(roleStr);
-    if (role == UserRole::User) {
-        cb(jsonError(400, "Invalid role"));
+    if (role == UserRole::Invalid) {
+        cb(jsonError(400, "Invalid role. Allowed: user, moderator, admin"));
         return;
     }
 
