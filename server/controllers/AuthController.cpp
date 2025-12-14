@@ -1,9 +1,10 @@
 #include "AuthController.h"
 
-#include <drogon/drogon.h>
-
 #include "services/AuthService.h"
 #include "core/Response.h"
+#include "mappers/RoleMapper.h"
+#include "mappers/UserMapper.h"
+#include "mappers/MapperRegistry.h"
 #include "core/RequestContextHelpers.h"
 
 using namespace drogon;
@@ -12,6 +13,8 @@ void AuthController::registerUser(
         const HttpRequestPtr &req,
         std::function<void(const HttpResponsePtr&)> &&callback
 ) {
+    REQUIRE_ADMIN(req, callback);
+
     auto json = req->getJsonObject();
     if (!json) {
         callback(jsonError(400, "Invalid body"));
@@ -30,11 +33,8 @@ void AuthController::registerUser(
                     return;
                 }
 
-                Json::Value body;
-                body[Const::JSON_ID] = user.id;
-                body[Const::JSON_EMAIL] = user.email;
-
-                callback(jsonCreated(body));
+                auto& M = MapperRegistry<UserDTO, UserMapper>::get();
+                callback(jsonCreated(M.toJson(user)));
             }
     );
 }
@@ -75,9 +75,8 @@ void AuthController::me(
 ) {
     REQUIRE_AUTH_USER(req, callback, user);
 
-    Json::Value body;
-    body[Const::JSON_ID] = user.id;
-    body[Const::JSON_EMAIL] = user.email;
+    auto& M = MapperRegistry<UserDTO, UserMapper>::get();
+    Json::Value body = M.toJson(user);
 
     callback(jsonOK(body));
 }

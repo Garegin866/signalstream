@@ -1,12 +1,19 @@
 #include "ItemsController.h"
-#include "../services/ItemsService.h"
-#include "Response.h"
+
+#include "services/ItemsService.h"
+#include "core/Response.h"
+#include "core/RequestContextHelpers.h"
+#include "mappers/MapperRegistry.h"
+#include "mappers/ItemMapper.h"
+
 #include <json/json.h>
 
 void ItemsController::createItem(
         const drogon::HttpRequestPtr& req,
         std::function<void(const drogon::HttpResponsePtr&)>&& cb
 ) {
+    REQUIRE_ADMIN(req, cb);
+
     auto json = req->getJsonObject();
     if (!json || !json->isMember(Const::JSON_TITLE)) {
         cb(jsonError(400, "title required"));
@@ -25,13 +32,8 @@ void ItemsController::createItem(
                     return;
                 }
 
-                Json::Value data;
-                data[Const::JSON_ID] = item.id;
-                data[Const::JSON_TITLE] = item.title;
-                data[Const::JSON_DESC] = item.description;
-                data[Const::JSON_URL] = item.url;
-
-                cb(jsonOK(data));
+                auto& M = MapperRegistry<ItemDTO, ItemMapper>::get();
+                cb(jsonOK(M.toJson(item)));
             }
     );
 }
@@ -55,13 +57,8 @@ void ItemsController::getItem(
                     return;
                 }
 
-                Json::Value data;
-                data[Const::JSON_ID] = item->id;
-                data[Const::JSON_TITLE] = item->title;
-                data[Const::JSON_DESC] = item->description;
-                data[Const::JSON_URL] = item->url;
-
-                cb(jsonOK(data));
+                auto& M = MapperRegistry<ItemDTO, ItemMapper>::get();
+                cb(jsonOK(M.toJson(*item)));
             }
     );
 }
@@ -78,14 +75,10 @@ void ItemsController::listItems(
                     return;
                 }
 
+                auto& M = MapperRegistry<ItemDTO, ItemMapper>::get();
                 Json::Value arr(Json::arrayValue);
                 for (const auto& item : items) {
-                    Json::Value v;
-                    v[Const::JSON_ID] = item.id;
-                    v[Const::JSON_TITLE] = item.title;
-                    v[Const::JSON_DESC] = item.description;
-                    v[Const::JSON_URL] = item.url;
-                    arr.append(v);
+                    arr.append(M.toJson(item));
                 }
 
                 Json::Value data;
@@ -102,6 +95,8 @@ void ItemsController::updateItem(
         std::function<void(const drogon::HttpResponsePtr&)>&& cb,
         int itemId
 ) {
+    REQUIRE_ADMIN(req, cb);
+
     auto json = req->getJsonObject();
     if (!json) {
         cb(jsonError(400, "Invalid json"));
@@ -125,23 +120,20 @@ void ItemsController::updateItem(
                     return;
                 }
 
-                Json::Value r;
-                r[Const::JSON_ID] = item->id;
-                r[Const::JSON_TITLE] = item->title;
-                r[Const::JSON_DESC] = item->description;
-                r[Const::JSON_URL] = item->url;
-
-                cb(jsonOK(r));
+                auto& M = MapperRegistry<ItemDTO, ItemMapper>::get();
+                cb(jsonOK(M.toJson(*item)));
             }
     );
 }
 
 
 void ItemsController::deleteItem(
-        const drogon::HttpRequestPtr&,
+        const drogon::HttpRequestPtr& req,
         std::function<void(const drogon::HttpResponsePtr&)>&& cb,
         int itemId
 ) {
+    REQUIRE_ADMIN(req, cb);
+
     ItemsService::deleteItem(
             itemId,
             [cb](bool ok, const AppError& err) {

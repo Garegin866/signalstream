@@ -23,6 +23,7 @@ namespace Const {
     inline constexpr const char* JSON_ID       = "id";
     inline constexpr const char* JSON_NAME     = "name";
     inline constexpr const char* JSON_EMAIL    = "email";
+    inline constexpr const char* JSON_ROLE     = "role";
     inline constexpr const char* JSON_TITLE    = "title";
     inline constexpr const char* JSON_URL      = "url";
     inline constexpr const char* JSON_DESC     = "description";
@@ -30,6 +31,7 @@ namespace Const {
     inline constexpr const char* JSON_DELETED  = "deleted";
     inline constexpr const char* JSON_REMOVED  = "removed";
     inline constexpr const char* JSON_ATTACHED = "attached";
+    inline constexpr const char* JSON_USER_ID  = "userId";
 
     // -----------------------------
     // Authentication JSON Keys
@@ -54,6 +56,7 @@ namespace Const {
     inline constexpr const char* COL_ID            = "id";
     inline constexpr const char* COL_EMAIL         = "email";
     inline constexpr const char* COL_PASSWORD_HASH = "password_hash";
+    inline constexpr const char* COL_ROLE          = "role";
     inline constexpr const char* COL_NAME          = "name";
     inline constexpr const char* COL_USER_ID       = "user_id";
     inline constexpr const char* COL_TOKEN         = "token";

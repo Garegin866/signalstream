@@ -1,9 +1,8 @@
 #include "TagsController.h"
 
-#include <drogon/drogon.h>
-
 #include "services/TagsService.h"
 #include "core/Response.h"
+#include "core/RequestContextHelpers.h"
 
 using namespace drogon;
 
@@ -39,6 +38,8 @@ void TagsController::createTag(
         const HttpRequestPtr &req,
         std::function<void(const HttpResponsePtr&)> &&callback
 ) {
+    REQUIRE_ADMIN(req, callback);
+
     auto json = req->getJsonObject();
     if (!json || !json->isMember(Const::JSON_NAME)) {
         callback(jsonError(400, "name required"));

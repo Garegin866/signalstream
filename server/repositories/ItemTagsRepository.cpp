@@ -1,6 +1,8 @@
 #include "ItemTagsRepository.h"
 
 #include "core/Constants.h"
+#include "mappers/MapperRegistry.h"
+#include "mappers/ItemMapper.h"
 
 // -----------------------------------------------------
 // 1. ATTACH TAG TO ITEM
@@ -86,11 +88,9 @@ void ItemTagsRepository::listItemsForTag(
                 std::vector<ItemDTO> items;
                 items.reserve(r.size());
 
+                auto& M = MapperRegistry<ItemDTO, ItemMapper>::get();
                 for (const auto& row : r) {
-                    ItemDTO dto;
-                    dto.id = row[Const::COL_ID].as<int>();
-                    dto.title = row[Const::COL_TITLE].as<std::string>();
-                    items.push_back(dto);
+                    items.push_back(M.fromRow(row));
                 }
 
                 cb(items, AppError{});

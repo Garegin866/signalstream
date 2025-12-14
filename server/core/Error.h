@@ -56,6 +56,10 @@ struct AppError {
         return AppError{ErrorType::Unauthorized, std::move(msg)};
     }
 
+    static AppError Forbidden(std::string msg) {
+        return AppError{ErrorType::Forbidden, std::move(msg)};
+    }
+
     static AppError Database(std::string msg) {
         return AppError{ErrorType::Database, std::move(msg)};
     }
