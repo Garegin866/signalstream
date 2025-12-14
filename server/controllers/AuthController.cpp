@@ -78,6 +78,7 @@ void AuthController::me(
     Json::Value body;
     body[Const::JSON_ID] = user.id;
     body[Const::JSON_EMAIL] = user.email;
+    body[Const::JSON_ROLE] = user.role;
 
     callback(jsonOK(body));
 }
