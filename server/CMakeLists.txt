@@ -24,6 +24,7 @@ set(SERVICES
         services/FeedService.cpp
         services/ItemsService.cpp
         services/ItemTagService.cpp
+        services/AdminService.cpp
 )
 
 set(CONTROLLERS
@@ -33,6 +34,7 @@ set(CONTROLLERS
         controllers/FeedController.cpp
         controllers/ItemTagsController.cpp
         controllers/ItemsController.cpp
+        controllers/AdminController.cpp
 )
 
 set(MIDDLEWARE

@@ -1,6 +1,8 @@
 #include "ItemsRepository.h"
 
 #include "core/Constants.h"
+#include "mappers/MapperRegistry.h"
+#include "mappers/ItemMapper.h"
 
 static std::string toPgArray(const std::vector<int>& ids) {
     std::string out = "{";
@@ -25,13 +27,8 @@ void ItemsRepository::getItemById(
                     return;
                 }
 
-                ItemDTO dto;
-                dto.id = r[0][Const::COL_ID].as<int>();
-                dto.title = r[0][Const::COL_TITLE].as<std::string>();
-                dto.description = r[0][Const::COL_DESCRIPTION].as<std::string>();
-                dto.url = r[0][Const::COL_URL].as<std::string>();
-
-                cb(dto, AppError{});
+                auto& M = MapperRegistry<ItemDTO, ItemMapper>::get();
+                cb(M.fromRow(r[0]), AppError{});
             },
             [cb](const std::exception_ptr&) {
                 cb({}, AppError::Database("Database error"));
@@ -59,13 +56,8 @@ void ItemsRepository::updateItem(
                     return;
                 }
 
-                ItemDTO dto;
-                dto.id = r[0][Const::COL_ID].as<int>();
-                dto.title = r[0][Const::COL_TITLE].as<std::string>();
-                dto.description = r[0][Const::COL_DESCRIPTION].as<std::string>();
-                dto.url = r[0][Const::COL_URL].as<std::string>();
-
-                cb(dto, AppError{});
+                auto& M = MapperRegistry<ItemDTO, ItemMapper>::get();
+                cb(M.fromRow(r[0]), AppError{});
             },
             [cb](const std::exception_ptr&) {
                 cb({}, AppError::Database("Database error"));
@@ -101,13 +93,9 @@ void ItemsRepository::listAll(
                 std::vector<ItemDTO> items;
                 items.reserve(r.size());
 
+                auto& M = MapperRegistry<ItemDTO, ItemMapper>::get();
                 for (const auto& row : r) {
-                    ItemDTO dto;
-                    dto.id = row[Const::COL_ID].as<int>();
-                    dto.title = row[Const::COL_TITLE].as<std::string>();
-                    dto.description = row[Const::COL_DESCRIPTION].as<std::string>();
-                    dto.url = row[Const::COL_URL].as<std::string>();
-                    items.push_back(dto);
+                    items.push_back(M.fromRow(row));
                 }
 
                 cb(items, AppError{});
@@ -129,12 +117,8 @@ void ItemsRepository::createItem(
             "INSERT INTO items (title, description, url) "
             "VALUES ($1, $2, $3) RETURNING id, title, description, url;",
             [cb](const drogon::orm::Result& r) {
-                ItemDTO dto;
-                dto.id = r[0][Const::COL_ID].as<int>();
-                dto.title = r[0][Const::COL_TITLE].as<std::string>();
-                dto.description = r[0][Const::COL_DESCRIPTION].as<std::string>();
-                dto.url = r[0][Const::COL_URL].as<std::string>();
-                cb(dto, AppError{});
+                auto& M = MapperRegistry<ItemDTO, ItemMapper>::get();
+                cb(M.fromRow(r[0]), AppError{});
             },
             [cb](const std::exception_ptr& eptr) {
                 cb({}, AppError::Database("Failed to create item"));
@@ -160,11 +144,10 @@ void ItemsRepository::getItemsByTagIds(
                 std::vector<ItemDTO> items;
                 items.reserve(r.size());
 
+                auto& M = MapperRegistry<ItemDTO, ItemMapper>::get();
                 for (const auto& row : r) {
-                    ItemDTO dto;
-                    dto.id = row[Const::COL_ID].as<int>();
-                    dto.title = row[Const::COL_TITLE].as<std::string>();
-                    items.push_back(dto);
+                    auto& M = MapperRegistry<ItemDTO, ItemMapper>::get();
+                    items.push_back(M.fromRow(row));
                 }
 
                 cb(items, AppError{});

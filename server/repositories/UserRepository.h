@@ -23,4 +23,9 @@ public:
             int userId,
             std::function<void(const std::optional<UserDTO>&, const AppError&)> cb
     );
+
+    static void listAllUsers(
+            drogon::orm::DbClientPtr client,
+            std::function<void(const std::vector<UserDTO>&, const AppError&)> cb
+    );
 };
