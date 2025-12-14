@@ -1,7 +1,8 @@
 #include "UserRepository.h"
 
 #include "core/Constants.h"
-#include "core/RoleUtils.h"
+#include "mappers/MapperRegistry.h"
+#include "mappers/UserMapper.h"
 
 void UserRepository::createUser(
         drogon::orm::DbClientPtr client,
@@ -14,12 +15,8 @@ void UserRepository::createUser(
             "VALUES ($1, $2, 'user') "
             "RETURNING id, email, role;",
             [cb](const drogon::orm::Result &r) {
-                UserDTO dto;
-                dto.id    = r[0][Const::COL_ID].as<int>();
-                dto.email = r[0][Const::COL_EMAIL].as<std::string>();
-                dto.role  = fromString(r[0][Const::COL_ROLE].as<std::string>());
-
-                cb(dto, AppError{});
+                auto& M = MapperRegistry<UserDTO, UserMapper>::get();
+                cb(M.fromRow(r[0]), AppError{});
             },
             [cb](const std::exception_ptr &eptr) {
                 try {
@@ -58,13 +55,10 @@ void UserRepository::findByEmail(
                     return;
                 }
 
-                UserDTO dto;
-                dto.id    = r[0][Const::COL_ID].as<int>();
-                dto.email = r[0][Const::COL_EMAIL].as<std::string>();
-                dto.role  = fromString(r[0][Const::COL_ROLE].as<std::string>());
+                auto& M = MapperRegistry<UserDTO, UserMapper>::get();
 
                 const std::string hash = r[0][Const::COL_PASSWORD_HASH].as<std::string>();
-                cb(dto, hash, AppError{});
+                cb(M.fromRow(r[0]), hash, AppError{});
             },
             [cb](const std::exception_ptr&) {
                 cb(std::nullopt, "", AppError::Database("Database error"));
@@ -87,16 +81,35 @@ void UserRepository::findById(
                     return;
                 }
 
-                UserDTO dto;
-                dto.id    = r[0][Const::COL_ID].as<int>();
-                dto.email = r[0][Const::COL_EMAIL].as<std::string>();
-                dto.role  = fromString(r[0][Const::COL_ROLE].as<std::string>());
-
-                cb(dto, AppError{});
+                auto& M = MapperRegistry<UserDTO, UserMapper>::get();
+                cb(M.fromRow(r[0]), AppError{});
             },
             [cb](const std::exception_ptr&) {
                 cb(std::nullopt, AppError::Database("Database error"));
             },
             userId
+    );
+}
+
+void UserRepository::listAllUsers(
+        drogon::orm::DbClientPtr client,
+        std::function<void(const std::vector<UserDTO>&, const AppError&)> cb
+) {
+    client->execSqlAsync(
+            "SELECT id, email, role FROM users ORDER BY id ASC;",
+            [cb](const drogon::orm::Result& r) {
+                std::vector<UserDTO> users;
+                users.reserve(r.size());
+
+                auto& M = MapperRegistry<UserDTO, UserMapper>::get();
+                for (const auto& row : r) {
+                    users.push_back(M.fromRow(row));
+                }
+
+                cb(users, AppError{});
+            },
+            [cb](const std::exception_ptr&) {
+                cb({}, AppError::Database("Failed to list users"));
+            }
     );
 }

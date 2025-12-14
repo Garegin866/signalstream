@@ -1,7 +1,5 @@
 #include "TagsController.h"
 
-#include <drogon/drogon.h>
-
 #include "services/TagsService.h"
 #include "core/Response.h"
 #include "core/RequestContextHelpers.h"
