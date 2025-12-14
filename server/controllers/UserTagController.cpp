@@ -1,9 +1,10 @@
 #include "UserTagController.h"
-#include "../services/UserTagService.h"
-#include "Response.h"
-#include "dto/TagDTO.h"
-#include "../services/AuthService.h"
+
+#include "services/UserTagService.h"
+#include "services/AuthService.h"
+#include "core/Response.h"
 #include "core/RequestContextHelpers.h"
+#include "dto/TagDTO.h"
 
 void UserTagController::attach(
         const drogon::HttpRequestPtr &req,

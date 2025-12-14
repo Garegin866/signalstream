@@ -3,7 +3,6 @@
 #include "services/ItemsService.h"
 #include "core/Response.h"
 #include "core/RequestContextHelpers.h"
-
 #include "mappers/MapperRegistry.h"
 #include "mappers/ItemMapper.h"
 

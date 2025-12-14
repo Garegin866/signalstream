@@ -1,7 +1,8 @@
 #include "FeedController.h"
+
 #include "services/AuthService.h"
 #include "services/FeedService.h"
-#include "Response.h"
+#include "core/Response.h"
 #include "core/RequestContextHelpers.h"
 
 void FeedController::getFeed(
