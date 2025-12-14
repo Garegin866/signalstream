@@ -113,3 +113,28 @@ void UserRepository::listAllUsers(
             }
     );
 }
+
+void UserRepository::updateRole(
+        drogon::orm::DbClientPtr client,
+        int userId,
+        UserRole role,
+        std::function<void(const UserDTO&, const AppError&)> cb
+) {
+    client->execSqlAsync(
+            "UPDATE users SET role=$2 WHERE id=$1 RETURNING id, email, role;",
+            [cb](const drogon::orm::Result &r) {
+                if (r.empty()) {
+                    cb({}, AppError::NotFound("User not found"));
+                    return;
+                }
+
+                auto M = MapperRegistry<UserDTO, UserMapper>::get();
+                cb(M.fromRow(r[0]), AppError{});
+            },
+            [cb](const std::exception_ptr &eptr) {
+                cb({}, AppError::Database("Failed to update role"));
+            },
+            userId,
+            toString(role)
+    );
+}
