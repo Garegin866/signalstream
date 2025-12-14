@@ -27,20 +27,20 @@
     auto userVar = req->attributes()->get<UserDTO>(Const::ATTR_USER);                     \
     auto tokenVar = req->attributes()->get<std::string>(Const::ATTR_TOKEN);
 
-#define REQUIRE_ROLE(req, fcb, requiredRole)                                              \
-    do {                                                                                  \
-        REQUIRE_AUTH_USER(req, fcb, user)                                                 \
-        if (user.role != requiredRole) {                                                  \
-            fcb(makeErrorResponse(AppError::Unauthorized("Insufficient role")));          \
-            return;                                                                       \
-        }                                                                                 \
-    } while(0)
-
 #define REQUIRE_ADMIN(req, fcb)                                                           \
     do {                                                                                  \
         REQUIRE_AUTH_USER(req, fcb, user)                                                 \
         if (user.role != UserRole::Admin) {                                               \
             fcb(makeErrorResponse(AppError::Forbidden("Admin access required")));         \
+            return;                                                                       \
+        }                                                                                 \
+    } while (0)
+
+#define REQUIRE_MOD_OR_ADMIN(req, fcb)                                              \
+    do {                                                                                  \
+        REQUIRE_AUTH_USER(req, fcb, user)                                                 \
+        if (user.role != UserRole::Admin && user.role != UserRole::Moderator) {           \
+            fcb(makeErrorResponse(AppError::Forbidden("Moderator or Admin access required"))); \
             return;                                                                       \
         }                                                                                 \
     } while (0)
