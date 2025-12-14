@@ -1,13 +1,18 @@
 #include "ItemTagsController.h"
-#include "../services/ItemTagService.h"
+
+#include "services/ItemTagService.h"
+#include "core/Response.h"
+#include "core/RequestContextHelpers.h"
+
 #include <json/json.h>
-#include "Response.h"
 
 void ItemTagsController::attachTag(
         const drogon::HttpRequestPtr& req,
         std::function<void(const drogon::HttpResponsePtr&)>&& cb,
         int itemId
 ) {
+    REQUIRE_ADMIN(req, cb);
+
     auto json = req->getJsonObject();
     if (!json || !json->isMember(Const::JSON_TAG_ID)) {
         cb(jsonError(400, "tagId required"));
@@ -33,10 +38,12 @@ void ItemTagsController::attachTag(
 }
 
 void ItemTagsController::listTags(
-        const drogon::HttpRequestPtr&,
+        const drogon::HttpRequestPtr& req,
         std::function<void(const drogon::HttpResponsePtr&)>&& cb,
         int itemId
 ) {
+    REQUIRE_ADMIN(req, cb);
+
     ItemTagService::getTagsForItem(
             itemId,
             [cb](const std::vector<TagDTO>& tags, const AppError& err) {
@@ -62,11 +69,13 @@ void ItemTagsController::listTags(
 }
 
 void ItemTagsController::removeTag(
-        const drogon::HttpRequestPtr&,
+        const drogon::HttpRequestPtr& req,
         std::function<void(const drogon::HttpResponsePtr&)>&& cb,
         int itemId,
         int tagId
 ) {
+    REQUIRE_ADMIN(req, cb);
+
     ItemTagService::removeTag(
             itemId,
             tagId,

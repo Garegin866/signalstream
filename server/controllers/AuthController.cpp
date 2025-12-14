@@ -13,6 +13,8 @@ void AuthController::registerUser(
         const HttpRequestPtr &req,
         std::function<void(const HttpResponsePtr&)> &&callback
 ) {
+    REQUIRE_ADMIN(req, callback);
+
     auto json = req->getJsonObject();
     if (!json) {
         callback(jsonError(400, "Invalid body"));
