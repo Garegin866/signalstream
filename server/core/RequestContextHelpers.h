@@ -39,7 +39,7 @@
 #define REQUIRE_ADMIN(req, fcb)                                                           \
     do {                                                                                  \
         REQUIRE_AUTH_USER(req, fcb, user)                                                 \
-        if (user.role != "admin") {                                                       \
+        if (user.role != UserRole::Admin) {                                                       \
             fcb(makeErrorResponse(AppError::Forbidden("Admin access required")));         \
             return;                                                                       \
         }                                                                                 \

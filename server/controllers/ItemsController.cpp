@@ -1,12 +1,17 @@
 #include "ItemsController.h"
-#include "../services/ItemsService.h"
-#include "Response.h"
+
+#include "services/ItemsService.h"
+#include "core/Response.h"
+#include "core/RequestContextHelpers.h"
+
 #include <json/json.h>
 
 void ItemsController::createItem(
         const drogon::HttpRequestPtr& req,
         std::function<void(const drogon::HttpResponsePtr&)>&& cb
 ) {
+    REQUIRE_ADMIN(req, cb);
+
     auto json = req->getJsonObject();
     if (!json || !json->isMember(Const::JSON_TITLE)) {
         cb(jsonError(400, "title required"));
@@ -102,6 +107,8 @@ void ItemsController::updateItem(
         std::function<void(const drogon::HttpResponsePtr&)>&& cb,
         int itemId
 ) {
+    REQUIRE_ADMIN(req, cb);
+
     auto json = req->getJsonObject();
     if (!json) {
         cb(jsonError(400, "Invalid json"));
@@ -138,10 +145,12 @@ void ItemsController::updateItem(
 
 
 void ItemsController::deleteItem(
-        const drogon::HttpRequestPtr&,
+        const drogon::HttpRequestPtr& req,
         std::function<void(const drogon::HttpResponsePtr&)>&& cb,
         int itemId
 ) {
+    REQUIRE_ADMIN(req, cb);
+
     ItemsService::deleteItem(
             itemId,
             [cb](bool ok, const AppError& err) {
