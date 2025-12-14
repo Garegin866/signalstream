@@ -4,6 +4,7 @@
 
 #include "services/AuthService.h"
 #include "core/Response.h"
+#include "core/RoleUtils.h"
 #include "core/RequestContextHelpers.h"
 
 using namespace drogon;
@@ -78,7 +79,7 @@ void AuthController::me(
     Json::Value body;
     body[Const::JSON_ID] = user.id;
     body[Const::JSON_EMAIL] = user.email;
-    body[Const::JSON_ROLE] = user.role;
+    body[Const::JSON_ROLE] = toString(user.role);
 
     callback(jsonOK(body));
 }

@@ -1,5 +1,7 @@
 #include "UserRepository.h"
+
 #include "core/Constants.h"
+#include "core/RoleUtils.h"
 
 void UserRepository::createUser(
         drogon::orm::DbClientPtr client,
@@ -15,7 +17,7 @@ void UserRepository::createUser(
                 UserDTO dto;
                 dto.id    = r[0][Const::COL_ID].as<int>();
                 dto.email = r[0][Const::COL_EMAIL].as<std::string>();
-                dto.role  = r[0][Const::COL_ROLE].as<std::string>();
+                dto.role  = fromString(r[0][Const::COL_ROLE].as<std::string>());
 
                 cb(dto, AppError{});
             },
@@ -59,7 +61,7 @@ void UserRepository::findByEmail(
                 UserDTO dto;
                 dto.id    = r[0][Const::COL_ID].as<int>();
                 dto.email = r[0][Const::COL_EMAIL].as<std::string>();
-                dto.role  = r[0][Const::COL_ROLE].as<std::string>();
+                dto.role  = fromString(r[0][Const::COL_ROLE].as<std::string>());
 
                 const std::string hash = r[0][Const::COL_PASSWORD_HASH].as<std::string>();
                 cb(dto, hash, AppError{});
@@ -88,7 +90,7 @@ void UserRepository::findById(
                 UserDTO dto;
                 dto.id    = r[0][Const::COL_ID].as<int>();
                 dto.email = r[0][Const::COL_EMAIL].as<std::string>();
-                dto.role  = r[0][Const::COL_ROLE].as<std::string>();
+                dto.role  = fromString(r[0][Const::COL_ROLE].as<std::string>());
 
                 cb(dto, AppError{});
             },
