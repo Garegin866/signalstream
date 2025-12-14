@@ -3,6 +3,7 @@
 #include "core/Error.h"
 
 #include <vector>
+#include <functional>
 
 class AdminService {
 public:
