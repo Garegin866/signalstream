@@ -3,7 +3,7 @@
 
 enum class UserRole {
     User,
-    Admin
+    Admin,
 };
 
 struct UserDTO {
