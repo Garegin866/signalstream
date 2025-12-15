@@ -1,8 +1,6 @@
 #include "UserContextMiddleware.h"
 #include "../repositories/UserRepository.h"
-#include "../core/Error.h"
 #include "../core/Response.h"
-#include "../core/Constants.h"
 
 #include <drogon/drogon.h>
 

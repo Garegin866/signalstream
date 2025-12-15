@@ -4,7 +4,7 @@
 
 void FeedService::getFeed(
         int userId,
-        std::function<void(const std::vector<FeedItemDTO>&, const AppError&)> cb
+        const std::function<void(const std::vector<FeedItemDTO>&, const AppError&)>& cb
 ) {
     auto client = drogon::app().getDbClient();
 

@@ -10,12 +10,12 @@ public:
             const std::string& title,
             const std::string& description,
             const std::string& url,
-            std::function<void(const ItemDTO&, const AppError&)> cb
+            const std::function<void(const ItemDTO&, const AppError&)>& cb
     );
 
     static void getItem(
             int itemId,
-            std::function<void(const std::optional<ItemDTO>&, const AppError&)> cb
+            const std::function<void(const std::optional<ItemDTO>&, const AppError&)>& cb
     );
 
     static void updateItem(
@@ -23,15 +23,15 @@ public:
             const std::string& title,
             const std::string& description,
             const std::string& url,
-            std::function<void(const std::optional<ItemDTO>&, const AppError&)> cb
+            const std::function<void(const std::optional<ItemDTO>&, const AppError&)>& cb
     );
 
     static void deleteItem(
             int itemId,
-            std::function<void(bool, const AppError&)> cb
+            const std::function<void(bool, const AppError&)>& cb
     );
 
     static void listItems(
-            std::function<void(const std::vector<ItemDTO>&, const AppError&)> cb
+            const std::function<void(const std::vector<ItemDTO>&, const AppError&)>& cb
     );
 };

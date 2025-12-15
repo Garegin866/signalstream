@@ -35,7 +35,7 @@ void ItemsService::createItem(
         const std::string& title,
         const std::string& description,
         const std::string& url,
-        std::function<void(const ItemDTO&, const AppError&)> cb
+        const std::function<void(const ItemDTO&, const AppError&)>& cb
 ) {
     // 1. Validate
     AppError err = validateItemFields(title, description, url);
@@ -64,7 +64,7 @@ void ItemsService::createItem(
 
 void ItemsService::getItem(
         int itemId,
-        std::function<void(const std::optional<ItemDTO>&, const AppError&)> cb
+        const std::function<void(const std::optional<ItemDTO>&, const AppError&)>& cb
 ) {
     auto client = drogon::app().getDbClient();
 
@@ -83,7 +83,7 @@ void ItemsService::updateItem(
         const std::string& title,
         const std::string& description,
         const std::string& url,
-        std::function<void(const std::optional<ItemDTO>&, const AppError&)> cb
+        const std::function<void(const std::optional<ItemDTO>&, const AppError&)>& cb
 ) {
     // 1. Validate
     AppError err = validateItemFields(title, description, url);
@@ -109,7 +109,7 @@ void ItemsService::updateItem(
 
 void ItemsService::deleteItem(
         int itemId,
-        std::function<void(bool, const AppError&)> cb
+        const std::function<void(bool, const AppError&)>& cb
 ) {
     auto client = drogon::app().getDbClient();
 
@@ -124,7 +124,7 @@ void ItemsService::deleteItem(
 
 
 void ItemsService::listItems(
-        std::function<void(const std::vector<ItemDTO>&, const AppError&)> cb
+        const std::function<void(const std::vector<ItemDTO>&, const AppError&)>& cb
 ) {
     auto client = drogon::app().getDbClient();
 

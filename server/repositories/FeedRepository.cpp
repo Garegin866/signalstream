@@ -3,9 +3,9 @@
 #include "core/Constants.h"
 
 void FeedRepository::getFeedForUser(
-        drogon::orm::DbClientPtr client,
+        const drogon::orm::DbClientPtr& client,
         int userId,
-        std::function<void(const std::vector<FeedItemDTO>&, const AppError&)> cb
+        const std::function<void(const std::vector<FeedItemDTO>&, const AppError&)>& cb
 ) {
     client->execSqlAsync(
             "SELECT i.id AS item_id, i.title, i.description, i.url, "

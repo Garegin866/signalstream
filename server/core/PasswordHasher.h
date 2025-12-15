@@ -35,7 +35,7 @@ public:
         if (result != ARGON2_OK)
             throw std::runtime_error("Argon2 hashing failed");
 
-        return std::string(hashbuf);
+        return {hashbuf};
     }
 
     static bool verify(const std::string &password, const std::string &encoded) {

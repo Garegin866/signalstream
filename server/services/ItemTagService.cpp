@@ -1,16 +1,18 @@
 #include "ItemTagService.h"
+
+#include "repositories/ItemTagsRepository.h"
+#include "repositories/ItemsRepository.h"
+#include "repositories/TagsRepository.h"
+
 #include <drogon/drogon.h>
-#include "../repositories/ItemTagsRepository.h"
-#include "../repositories/ItemsRepository.h"
-#include "../repositories/TagsRepository.h"
 
 // Validate existence of item and tag before attaching
 static void validateItemAndTag(
-        drogon::orm::DbClientPtr client,
+        const drogon::orm::DbClientPtr& client,
         int itemId,
         int tagId,
-        std::function<void(bool, const AppError&)> cb,
-        std::function<void()> onValid
+        const std::function<void(bool, const AppError&)>& cb,
+        const std::function<void()>& onValid
 ) {
     // 1. Check item
     ItemsRepository::getItemById(
@@ -49,7 +51,7 @@ static void validateItemAndTag(
 void ItemTagService::attachTag(
         int itemId,
         int tagId,
-        std::function<void(bool, const AppError&)> cb
+        const std::function<void(bool, const AppError&)>& cb
 ) {
     auto client = drogon::app().getDbClient();
 
@@ -70,7 +72,7 @@ void ItemTagService::attachTag(
 
 void ItemTagService::getTagsForItem(
         int itemId,
-        std::function<void(const std::vector<TagDTO>&, const AppError&)> cb
+        const std::function<void(const std::vector<TagDTO>&, const AppError&)>& cb
 ) {
     auto client = drogon::app().getDbClient();
 
@@ -86,7 +88,7 @@ void ItemTagService::getTagsForItem(
 void ItemTagService::removeTag(
         int itemId,
         int tagId,
-        std::function<void(bool, const AppError&)> cb
+        const std::function<void(bool, const AppError&)>& cb
 ) {
     auto client = drogon::app().getDbClient();
 

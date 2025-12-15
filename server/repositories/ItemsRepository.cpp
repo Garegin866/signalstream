@@ -15,9 +15,9 @@ static std::string toPgArray(const std::vector<int>& ids) {
 }
 
 void ItemsRepository::getItemById(
-        drogon::orm::DbClientPtr client,
+        const drogon::orm::DbClientPtr& client,
         int itemId,
-        std::function<void(const std::optional<ItemDTO>&, const AppError&)> cb
+        const std::function<void(const std::optional<ItemDTO>&, const AppError&)>& cb
 ) {
     client->execSqlAsync(
             "SELECT id, title, description, url FROM items WHERE id=$1;",
@@ -38,12 +38,12 @@ void ItemsRepository::getItemById(
 }
 
 void ItemsRepository::updateItem(
-        drogon::orm::DbClientPtr client,
+        const drogon::orm::DbClientPtr& client,
         int itemId,
         const std::string& title,
         const std::string& description,
         const std::string& url,
-        std::function<void(const std::optional<ItemDTO>&, const AppError&)> cb
+        const std::function<void(const std::optional<ItemDTO>&, const AppError&)>& cb
 ) {
     client->execSqlAsync(
             "UPDATE items "
@@ -67,9 +67,9 @@ void ItemsRepository::updateItem(
 }
 
 void ItemsRepository::deleteItem(
-        drogon::orm::DbClientPtr client,
+        const drogon::orm::DbClientPtr& client,
         int itemId,
-        std::function<void(bool, const AppError&)> cb
+        const std::function<void(bool, const AppError&)>& cb
 ) {
     client->execSqlAsync(
             "DELETE FROM items WHERE id=$1;",
@@ -84,8 +84,8 @@ void ItemsRepository::deleteItem(
 }
 
 void ItemsRepository::listAll(
-        drogon::orm::DbClientPtr client,
-        std::function<void(const std::vector<ItemDTO>&, const AppError&)> cb
+        const drogon::orm::DbClientPtr& client,
+        const std::function<void(const std::vector<ItemDTO>&, const AppError&)>& cb
 ) {
     client->execSqlAsync(
             "SELECT id, title, description, url FROM items ORDER BY id DESC;",
@@ -107,11 +107,11 @@ void ItemsRepository::listAll(
 }
 
 void ItemsRepository::createItem(
-        drogon::orm::DbClientPtr client,
+        const drogon::orm::DbClientPtr& client,
         const std::string& title,
         const std::string& description,
         const std::string& url,
-        std::function<void(const ItemDTO&, const AppError&)> cb
+        const std::function<void(const ItemDTO&, const AppError&)>& cb
 ) {
     client->execSqlAsync(
             "INSERT INTO items (title, description, url) "
@@ -128,9 +128,9 @@ void ItemsRepository::createItem(
 }
 
 void ItemsRepository::getItemsByTagIds(
-        drogon::orm::DbClientPtr client,
+        const drogon::orm::DbClientPtr& client,
         const std::vector<int>& tagIds,
-        std::function<void(const std::vector<ItemDTO>&, const AppError&)> cb
+        const std::function<void(const std::vector<ItemDTO>&, const AppError&)>& cb
 ) {
     std::string arr = toPgArray(tagIds);
 
@@ -146,7 +146,6 @@ void ItemsRepository::getItemsByTagIds(
 
                 auto& M = MapperRegistry<ItemDTO, ItemMapper>::get();
                 for (const auto& row : r) {
-                    auto& M = MapperRegistry<ItemDTO, ItemMapper>::get();
                     items.push_back(M.fromRow(row));
                 }
 

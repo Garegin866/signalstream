@@ -8,10 +8,10 @@
 // 1. ATTACH TAG TO ITEM
 // -----------------------------------------------------
 void ItemTagsRepository::attachTagToItem(
-        drogon::orm::DbClientPtr client,
+        const drogon::orm::DbClientPtr& client,
         int itemId,
         int tagId,
-        std::function<void(bool, const AppError&)> cb
+        const std::function<void(bool, const AppError&)>& cb
 ) {
     client->execSqlAsync(
             "INSERT INTO item_tags (item_id, tag_id) VALUES ($1, $2);",
@@ -39,9 +39,9 @@ void ItemTagsRepository::attachTagToItem(
 // 2. LIST TAGS FOR ITEM
 // -----------------------------------------------------
 void ItemTagsRepository::listTagsForItem(
-        drogon::orm::DbClientPtr client,
+        const drogon::orm::DbClientPtr& client,
         int itemId,
-        std::function<void(const std::vector<TagDTO>&, const AppError&)> cb
+        const std::function<void(const std::vector<TagDTO>&, const AppError&)>& cb
 ) {
     client->execSqlAsync(
             "SELECT t.id, t.name "
@@ -74,9 +74,9 @@ void ItemTagsRepository::listTagsForItem(
 // 3. LIST ITEMS FOR A TAG (Optional helper)
 // -----------------------------------------------------
 void ItemTagsRepository::listItemsForTag(
-        drogon::orm::DbClientPtr client,
+        const drogon::orm::DbClientPtr& client,
         int tagId,
-        std::function<void(const std::vector<ItemDTO>&, const AppError&)> cb
+        const std::function<void(const std::vector<ItemDTO>&, const AppError&)>& cb
 ) {
     client->execSqlAsync(
             "SELECT i.id, i.title "
@@ -107,10 +107,10 @@ void ItemTagsRepository::listItemsForTag(
 // 4. REMOVE TAG FROM ITEM
 // -----------------------------------------------------
 void ItemTagsRepository::removeTagFromItem(
-        drogon::orm::DbClientPtr client,
+        const drogon::orm::DbClientPtr& client,
         int itemId,
         int tagId,
-        std::function<void(bool, const AppError&)> cb
+        const std::function<void(bool, const AppError&)>& cb
 ) {
     client->execSqlAsync(
             "DELETE FROM item_tags WHERE item_id = $1 AND tag_id = $2;",
