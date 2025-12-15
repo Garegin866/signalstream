@@ -50,3 +50,11 @@ void AdminService::setRole(
             }
     );
 }
+
+void AdminService::listModerators(
+        std::function<void(const std::vector<UserDTO>&, const AppError&)> cb
+) {
+    auto client = drogon::app().getDbClient();
+
+    UserRepository::listModerators(client, cb);
+}

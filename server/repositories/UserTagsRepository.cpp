@@ -5,10 +5,10 @@
 #include "../core/Constants.h"
 
 void UserTagsRepository::attach(
-        drogon::orm::DbClientPtr client,
+        const drogon::orm::DbClientPtr& client,
         int userId,
         int tagId,
-        std::function<void(bool, const AppError&)> cb
+        const std::function<void(bool, const AppError&)>& cb
 ) {
     client->execSqlAsync(
             "INSERT INTO user_tags (user_id, tag_id) VALUES ($1, $2);",
@@ -37,9 +37,9 @@ void UserTagsRepository::attach(
 }
 
 void UserTagsRepository::listForUser(
-        drogon::orm::DbClientPtr client,
+        const drogon::orm::DbClientPtr& client,
         int userId,
-        std::function<void(const std::vector<TagDTO>&, const AppError&)> cb
+        const std::function<void(const std::vector<TagDTO>&, const AppError&)>& cb
 ) {
     client->execSqlAsync(
             "SELECT t.id, t.name "

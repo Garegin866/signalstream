@@ -32,6 +32,7 @@ namespace Const {
     inline constexpr const char* JSON_REMOVED  = "removed";
     inline constexpr const char* JSON_ATTACHED = "attached";
     inline constexpr const char* JSON_USER_ID  = "userId";
+    inline constexpr const char* JSON_MODERS   = "moderators";
 
     // -----------------------------
     // Authentication JSON Keys

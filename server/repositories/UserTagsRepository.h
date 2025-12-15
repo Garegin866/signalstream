@@ -8,15 +8,15 @@
 class UserTagsRepository {
 public:
     static void attach(
-            drogon::orm::DbClientPtr client,
+            const drogon::orm::DbClientPtr& client,
             int userId,
             int tagId,
-            std::function<void(bool, const AppError&)> cb
+            const std::function<void(bool, const AppError&)>& cb
     );
 
     static void listForUser(
-            drogon::orm::DbClientPtr client,
+            const drogon::orm::DbClientPtr& client,
             int userId,
-            std::function<void(const std::vector<TagDTO>&, const AppError&)> cb
+            const std::function<void(const std::vector<TagDTO>&, const AppError&)>& cb
     );
 };

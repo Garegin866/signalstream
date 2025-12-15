@@ -1,4 +1,5 @@
 #pragma once
+
 #include "dto/AuthDTO.h"
 #include "core/Error.h"
 
@@ -12,6 +13,10 @@ public:
     );
 
     static void setRole(int targetUserId, UserRole newRole, int actingUserId,
-                        std::function<void(const UserDTO&, const AppError&)> cb
+            std::function<void(const UserDTO&, const AppError&)> cb
+    );
+
+    static void listModerators(
+            std::function<void(const std::vector<UserDTO>&, const AppError&)> cb
     );
 };

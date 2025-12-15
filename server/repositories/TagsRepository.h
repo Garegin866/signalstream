@@ -6,19 +6,19 @@
 class TagsRepository {
 public:
     static void createTag(
-            drogon::orm::DbClientPtr client,
+            const drogon::orm::DbClientPtr& client,
             const std::string &name,
-            std::function<void(const TagDTO&, const AppError&)> cb
+            const std::function<void(const TagDTO&, const AppError&)>& cb
     );
 
     static void listTags(
-            drogon::orm::DbClientPtr client,
-            std::function<void(const std::vector<TagDTO>&, const AppError&)> cb
+            const drogon::orm::DbClientPtr& client,
+            const std::function<void(const std::vector<TagDTO>&, const AppError&)>& cb
     );
 
     static void findById(
-            drogon::orm::DbClientPtr client,
+            const drogon::orm::DbClientPtr& client,
             int tagId,
-            std::function<void(const std::optional<TagDTO>&, const AppError&)> cb
+            const std::function<void(const std::optional<TagDTO>&, const AppError&)>& cb
     );
 };

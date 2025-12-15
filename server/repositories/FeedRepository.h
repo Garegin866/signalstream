@@ -9,9 +9,9 @@
 class FeedRepository {
 public:
     static void getFeedForUser(
-            drogon::orm::DbClientPtr client,
+            const drogon::orm::DbClientPtr& client,
             int userId,
-            std::function<void(const std::vector<FeedItemDTO>&, const AppError&)> cb
+            const std::function<void(const std::vector<FeedItemDTO>&, const AppError&)>& cb
     );
 
 };

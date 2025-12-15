@@ -5,10 +5,10 @@
 #include "mappers/UserMapper.h"
 
 void UserRepository::createUser(
-        drogon::orm::DbClientPtr client,
+        const drogon::orm::DbClientPtr& client,
         const std::string &email,
         const std::string &passwordHash,
-        std::function<void(const UserDTO&, const AppError&)> cb
+        const std::function<void(const UserDTO&, const AppError&)>& cb
 ) {
     client->execSqlAsync(
             "INSERT INTO users (email, password_hash, role) "
@@ -40,11 +40,11 @@ void UserRepository::createUser(
 
 
 void UserRepository::findByEmail(
-        drogon::orm::DbClientPtr client,
+        const drogon::orm::DbClientPtr& client,
         const std::string &email,
-        std::function<void(const std::optional<UserDTO>&,
+        const std::function<void(const std::optional<UserDTO>&,
                            const std::string &passwordHash,
-                           const AppError&)> cb
+                           const AppError&)>& cb
 ) {
     client->execSqlAsync(
             "SELECT id, email, password_hash, role "
@@ -69,9 +69,9 @@ void UserRepository::findByEmail(
 
 
 void UserRepository::findById(
-        drogon::orm::DbClientPtr client,
+        const drogon::orm::DbClientPtr& client,
         int userId,
-        std::function<void(const std::optional<UserDTO>&, const AppError&)> cb
+        const std::function<void(const std::optional<UserDTO>&, const AppError&)>& cb
 ) {
     client->execSqlAsync(
             "SELECT id, email, role FROM users WHERE id=$1 LIMIT 1;",
@@ -92,8 +92,8 @@ void UserRepository::findById(
 }
 
 void UserRepository::listAllUsers(
-        drogon::orm::DbClientPtr client,
-        std::function<void(const std::vector<UserDTO>&, const AppError&)> cb
+        const drogon::orm::DbClientPtr& client,
+        const std::function<void(const std::vector<UserDTO>&, const AppError&)>& cb
 ) {
     client->execSqlAsync(
             "SELECT id, email, role FROM users ORDER BY id ASC;",
@@ -115,10 +115,10 @@ void UserRepository::listAllUsers(
 }
 
 void UserRepository::updateRole(
-        drogon::orm::DbClientPtr client,
+        const drogon::orm::DbClientPtr& client,
         int userId,
         UserRole role,
-        std::function<void(const UserDTO&, const AppError&)> cb
+        const std::function<void(const UserDTO&, const AppError&)>& cb
 ) {
     client->execSqlAsync(
             "UPDATE users SET role=$2 WHERE id=$1 RETURNING id, email, role;",
@@ -136,5 +136,28 @@ void UserRepository::updateRole(
             },
             userId,
             toString(role)
+    );
+}
+
+void UserRepository::listModerators(
+        const drogon::orm::DbClientPtr& client,
+        const std::function<void(const std::vector<UserDTO>&, const AppError&)>& cb
+) {
+    client->execSqlAsync(
+            "SELECT id, email, role FROM users WHERE role = 'moderator' ORDER BY id ASC;",
+            [cb](const drogon::orm::Result& r) {
+                std::vector<UserDTO> out;
+                out.reserve(r.size());
+
+                for (const auto& row : r) {
+                    auto M = MapperRegistry<UserDTO, UserMapper>::get();
+                    out.push_back(M.fromRow(row));
+                }
+
+                cb(out, AppError{});
+            },
+            [cb](const std::exception_ptr&) {
+                cb({}, AppError::Database("Failed to list moderators"));
+            }
     );
 }

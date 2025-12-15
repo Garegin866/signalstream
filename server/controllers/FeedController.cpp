@@ -9,7 +9,7 @@ void FeedController::getFeed(
         const HttpRequestPtr& req,
         std::function<void(const HttpResponsePtr&)>&& callback
 ) {
-    REQUIRE_AUTH_USER(req, callback, user);
+    REQUIRE_AUTH_USER(req, callback, user)
 
     FeedService::getFeed(
             user.id,

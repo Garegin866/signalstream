@@ -7,6 +7,6 @@ class FeedService {
 public:
     static void getFeed(
             int userId,
-            std::function<void(const std::vector<FeedItemDTO>&, const AppError&)> cb
+            const std::function<void(const std::vector<FeedItemDTO>&, const AppError&)>& cb
     );
 };

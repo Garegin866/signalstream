@@ -1,7 +1,6 @@
 #include "TokenMiddleware.h"
 #include "../repositories/SessionRepository.h"
 #include "../core/Response.h"
-#include "../core/Constants.h"
 
 #include <drogon/drogon.h>
 #include <drogon/HttpAppFramework.h>

@@ -67,3 +67,31 @@ void AdminController::setRole(
             }
     );
 }
+
+void AdminController::listModerators(
+        const drogon::HttpRequestPtr& req,
+        std::function<void(const drogon::HttpResponsePtr&)>&& callback
+) {
+    REQUIRE_ADMIN(req, callback);
+
+    AdminService::listModerators(
+            [callback](const std::vector<UserDTO>& users, const AppError& err) {
+                if (err.hasError()) {
+                    callback(makeErrorResponse(err));
+                    return;
+                }
+
+                Json::Value arr(Json::arrayValue);
+
+                auto M = MapperRegistry<UserDTO, UserMapper>::get();
+                for (const auto& u : users) {
+                    arr.append(M.toJson(u));
+                }
+
+                Json::Value body;
+                body[Const::JSON_MODERS] = arr;
+
+                callback(jsonOK(body));
+            }
+    );
+}
