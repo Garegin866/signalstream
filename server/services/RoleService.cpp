@@ -4,22 +4,22 @@ bool RoleService::isAdmin(const UserDTO& user) {
     return user.role == UserRole::Admin;
 }
 
-bool RoleService::isModerator(const UserDTO& u) {
-    return u.role == UserRole::Moderator;
+bool RoleService::isModerator(const UserDTO& user) {
+    return user.role == UserRole::Moderator;
 }
 
-bool RoleService::isPrivileged(const UserDTO& u) {
-    return u.role == UserRole::Admin || u.role == UserRole::Moderator;
+bool RoleService::isPrivileged(const UserDTO& user) {
+    return user.role == UserRole::Admin || user.role == UserRole::Moderator;
 }
 
-bool RoleService::canManageUsers(const UserDTO& u) {
-    return isAdmin(u);
+bool RoleService::canManageUsers(const UserDTO& user) {
+    return ROLE_AT_LEAST(user, UserRole::Admin);
 }
 
 bool RoleService::canManageTags(const UserDTO& user) {
-    return isAdmin(user);
+    return ROLE_AT_LEAST(user, UserRole::Admin);
 }
 
 bool RoleService::canManageItems(const UserDTO& user) {
-    return isAdmin(user);
+    return ROLE_AT_LEAST(user, UserRole::Moderator);
 }
