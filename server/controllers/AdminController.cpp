@@ -34,8 +34,8 @@ void AdminController::setRole(
         const HttpRequestPtr& req,
         std::function<void(const HttpResponsePtr&)>&& cb
 ) {
-    REQUIRE_ADMIN(req, cb);       // admin-only
-    REQUIRE_AUTH_USER(req, cb, actingUser);
+    REQUIRE_ADMIN(req, cb);
+    REQUIRE_AUTH_USER(req, cb, actingUser)
 
     auto json = req->getJsonObject();
     if (!json || !json->isMember(Const::JSON_USER_ID) || !json->isMember(Const::JSON_ROLE)) {
@@ -53,9 +53,9 @@ void AdminController::setRole(
     }
 
     AdminService::setRole(
+            actingUser.id,
             targetUserId,
             role,
-            actingUser.id,
             [cb](const UserDTO& user, const AppError& err) {
                 if (err.hasError()) {
                     cb(makeErrorResponse(err));
