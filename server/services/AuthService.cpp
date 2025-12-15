@@ -8,7 +8,7 @@
 void AuthService::registerUser(
         const std::string &email,
         const std::string &password,
-        std::function<void(const UserDTO&, const AppError&)> cb
+        const std::function<void(const UserDTO&, const AppError&)>& cb
 ) {
     if (email.empty() || password.empty()) {
         cb({}, AppError::Validation("Email and password required"));
@@ -24,7 +24,7 @@ void AuthService::registerUser(
 void AuthService::loginUser(
         const std::string &email,
         const std::string &password,
-        std::function<void(const SessionDTO&, const AppError&)> cb
+        const std::function<void(const SessionDTO&, const AppError&)>& cb
 ) {
     if (email.empty() || password.empty()) {
         cb({}, AppError::Validation("Email and password required"));
@@ -66,7 +66,7 @@ void AuthService::loginUser(
 
 void AuthService::logout(
         const std::string &token,
-        std::function<void(const AppError&)> cb
+        const std::function<void(const AppError&)>& cb
 ) {
     auto client = drogon::app().getDbClient();
 

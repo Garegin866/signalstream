@@ -1,5 +1,7 @@
 #include "AdminService.h"
+
 #include "repositories/UserRepository.h"
+#include "services/RoleService.h"
 
 #include <drogon/drogon.h>
 
@@ -10,43 +12,27 @@ void AdminService::listUsers(
     UserRepository::listAllUsers(client, cb);
 }
 
-void AdminService::setRole(
-        int targetUserId,
-        UserRole newRole,
-        int actingUserId,
+void AdminService::setRole(int actorId, int targetUserId, UserRole newRole,
         std::function<void(const UserDTO&, const AppError&)> cb
 ) {
-    // 1. Prevent self-demotion (optional)
-    if (targetUserId == actingUserId) {
-        cb({}, AppError::Forbidden("You cannot change your own role"));
+    if (!RoleService::isValidRole(newRole)) {
+        cb({}, AppError::Validation("Invalid role"));
+        return;
+    }
+
+    if (actorId == targetUserId && newRole != UserRole::Admin) {
+        cb({}, AppError::Forbidden("Admin cannot remove their own admin role"));
         return;
     }
 
     auto client = drogon::app().getDbClient();
+    UserRepository::updateRole(client, targetUserId, newRole, cb);
+}
 
-    // 2. Validate target user exists first
-    UserRepository::findById(
-            client,
-            targetUserId,
-            [client, newRole, cb](const std::optional<UserDTO>& user, const AppError& err) {
-                if (err.hasError()) {
-                    cb({}, err);
-                    return;
-                }
-                if (!user) {
-                    cb({}, AppError::NotFound("Target user not found"));
-                    return;
-                }
+void AdminService::listModerators(
+        std::function<void(const std::vector<UserDTO>&, const AppError&)> cb
+) {
+    auto client = drogon::app().getDbClient();
 
-                // 3. Update role
-                UserRepository::updateRole(
-                        client,
-                        user->id,
-                        newRole,
-                        [cb](const UserDTO& updated, const AppError& err2) {
-                            cb(updated, err2);
-                        }
-                );
-            }
-    );
+    UserRepository::listModerators(client, cb);
 }

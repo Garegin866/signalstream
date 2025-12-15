@@ -9,11 +9,11 @@ public:
     static void attachTag(
             int userId,
             int tagId,
-            std::function<void(const AppError&)> cb
+            const std::function<void(const AppError&)>& cb
     );
 
     static void listUserTags(
             int userId,
-            std::function<void(const std::vector<TagDTO>&, const AppError&)> cb
+            const std::function<void(const std::vector<TagDTO>&, const AppError&)>& cb
     );
 };

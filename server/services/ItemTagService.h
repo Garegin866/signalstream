@@ -9,17 +9,17 @@ public:
     static void attachTag(
             int itemId,
             int tagId,
-            std::function<void(bool, const AppError&)> cb
+            const std::function<void(bool, const AppError&)>& cb
     );
 
     static void getTagsForItem(
             int itemId,
-            std::function<void(const std::vector<TagDTO>&, const AppError&)> cb
+            const std::function<void(const std::vector<TagDTO>&, const AppError&)>& cb
     );
 
     static void removeTag(
             int itemId,
             int tagId,
-            std::function<void(bool, const AppError&)> cb
+            const std::function<void(bool, const AppError&)>& cb
     );
 };

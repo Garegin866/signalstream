@@ -12,7 +12,7 @@ void ItemsController::createItem(
         const drogon::HttpRequestPtr& req,
         std::function<void(const drogon::HttpResponsePtr&)>&& cb
 ) {
-    REQUIRE_ADMIN(req, cb);
+    REQUIRE_MOD_OR_ADMIN(req, cb);
 
     auto json = req->getJsonObject();
     if (!json || !json->isMember(Const::JSON_TITLE)) {
@@ -95,7 +95,7 @@ void ItemsController::updateItem(
         std::function<void(const drogon::HttpResponsePtr&)>&& cb,
         int itemId
 ) {
-    REQUIRE_ADMIN(req, cb);
+    REQUIRE_MOD_OR_ADMIN(req, cb);
 
     auto json = req->getJsonObject();
     if (!json) {
@@ -132,7 +132,7 @@ void ItemsController::deleteItem(
         std::function<void(const drogon::HttpResponsePtr&)>&& cb,
         int itemId
 ) {
-    REQUIRE_ADMIN(req, cb);
+    REQUIRE_MOD_OR_ADMIN(req, cb);
 
     ItemsService::deleteItem(
             itemId,

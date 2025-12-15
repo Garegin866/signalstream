@@ -11,7 +11,7 @@ void ItemTagsController::attachTag(
         std::function<void(const drogon::HttpResponsePtr&)>&& cb,
         int itemId
 ) {
-    REQUIRE_ADMIN(req, cb);
+    REQUIRE_MOD_OR_ADMIN(req, cb);
 
     auto json = req->getJsonObject();
     if (!json || !json->isMember(Const::JSON_TAG_ID)) {
@@ -42,7 +42,7 @@ void ItemTagsController::listTags(
         std::function<void(const drogon::HttpResponsePtr&)>&& cb,
         int itemId
 ) {
-    REQUIRE_ADMIN(req, cb);
+    REQUIRE_MOD_OR_ADMIN(req, cb);
 
     ItemTagService::getTagsForItem(
             itemId,
@@ -74,7 +74,7 @@ void ItemTagsController::removeTag(
         int itemId,
         int tagId
 ) {
-    REQUIRE_ADMIN(req, cb);
+    REQUIRE_MOD_OR_ADMIN(req, cb);
 
     ItemTagService::removeTag(
             itemId,

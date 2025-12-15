@@ -3,10 +3,10 @@
 #include "core/Constants.h"
 
 void SessionRepository::createSession(
-        drogon::orm::DbClientPtr client,
+        const drogon::orm::DbClientPtr& client,
         int userId,
         const std::string &token,
-        std::function<void(const SessionDTO&, const AppError&)> cb
+        const std::function<void(const SessionDTO&, const AppError&)>& cb
 ) {
     client->execSqlAsync(
             "INSERT INTO sessions (user_id, token) VALUES ($1, $2) RETURNING id, user_id, token;",
@@ -26,9 +26,9 @@ void SessionRepository::createSession(
 
 
 void SessionRepository::findByToken(
-        drogon::orm::DbClientPtr client,
+        const drogon::orm::DbClientPtr& client,
         const std::string &token,
-        std::function<void(const std::optional<SessionDTO>&, const AppError&)> cb
+        const std::function<void(const std::optional<SessionDTO>&, const AppError&)>& cb
 ) {
     client->execSqlAsync(
             "SELECT id, user_id, token FROM sessions WHERE token=$1 LIMIT 1;",
@@ -53,9 +53,9 @@ void SessionRepository::findByToken(
 }
 
 void SessionRepository::deleteByToken(
-        drogon::orm::DbClientPtr client,
+        const drogon::orm::DbClientPtr& client,
         const std::string &token,
-        std::function<void(bool, const AppError&)> cb
+        const std::function<void(bool, const AppError&)>& cb
 ) {
     client->execSqlAsync(
             "DELETE FROM sessions WHERE token=$1;",

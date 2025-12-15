@@ -5,9 +5,9 @@
 #include "../core/Constants.h"
 
 void TagsRepository::createTag(
-        drogon::orm::DbClientPtr client,
+        const drogon::orm::DbClientPtr& client,
         const std::string &name,
-        std::function<void(const TagDTO&, const AppError&)> cb
+        const std::function<void(const TagDTO&, const AppError&)>& cb
 ) {
     client->execSqlAsync(
             "INSERT INTO tags (name) VALUES ($1) RETURNING id, name;",
@@ -36,8 +36,8 @@ void TagsRepository::createTag(
 }
 
 void TagsRepository::listTags(
-        drogon::orm::DbClientPtr client,
-        std::function<void(const std::vector<TagDTO>&, const AppError&)> cb
+        const drogon::orm::DbClientPtr& client,
+        const std::function<void(const std::vector<TagDTO>&, const AppError&)>& cb
 ) {
     client->execSqlAsync(
             "SELECT id, name FROM tags ORDER BY name;",
@@ -68,9 +68,9 @@ void TagsRepository::listTags(
 }
 
 void TagsRepository::findById(
-        drogon::orm::DbClientPtr client,
+        const drogon::orm::DbClientPtr& client,
         int tagId,
-        std::function<void(const std::optional<TagDTO>&, const AppError&)> cb
+        const std::function<void(const std::optional<TagDTO>&, const AppError&)>& cb
 ) {
     client->execSqlAsync(
             "SELECT id, name FROM tags WHERE id=$1 LIMIT 1;",
