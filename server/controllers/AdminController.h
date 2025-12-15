@@ -21,7 +21,7 @@ public:
             std::function<void(const drogon::HttpResponsePtr&)>&& cb
     );
 
-    void listModerators(
+    static void listModerators(
             const drogon::HttpRequestPtr& req,
             std::function<void(const drogon::HttpResponsePtr&)>&& callback
     );

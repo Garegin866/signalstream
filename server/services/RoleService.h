@@ -10,4 +10,6 @@ public:
     static bool canManageUsers(const UserDTO& user);
     static bool canManageItems(const UserDTO& user);
     static bool canManageTags(const UserDTO& user);
+
+    static bool isValidRole(UserRole role);
 };

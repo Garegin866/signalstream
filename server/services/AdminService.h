@@ -12,7 +12,7 @@ public:
             std::function<void(const std::vector<UserDTO>&, const AppError&)> cb
     );
 
-    static void setRole(int targetUserId, UserRole newRole, int actingUserId,
+    static void setRole(int actorId, int targetUserId, UserRole newRole,
             std::function<void(const UserDTO&, const AppError&)> cb
     );
 

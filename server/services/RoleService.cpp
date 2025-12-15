@@ -23,3 +23,9 @@ bool RoleService::canManageTags(const UserDTO& user) {
 bool RoleService::canManageItems(const UserDTO& user) {
     return ROLE_AT_LEAST(user, UserRole::Moderator);
 }
+
+bool RoleService::isValidRole(UserRole r) {
+    return r == UserRole::User ||
+           r == UserRole::Moderator ||
+           r == UserRole::Admin;
+}
