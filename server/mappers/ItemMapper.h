@@ -8,10 +8,10 @@ class ItemMapper : public BaseMapper<ItemDTO> {
 public:
     [[nodiscard]] ItemDTO fromRow(const drogon::orm::Row &row) const override {
         ItemDTO dto;
-        dto.id    = row["id"].as<int>();
-        dto.title = row["title"].as<std::string>();
-        dto.description = row["description"].as<std::string>();
-        dto.url = row["url"].as<std::string>();
+        dto.id    = row[Const::COL_ID].as<int>();
+        dto.title = row[Const::COL_TITLE].as<std::string>();
+        dto.description = row[Const::COL_DESCRIPTION].as<std::string>();
+        dto.url = row[Const::COL_URL].as<std::string>();
         return dto;
     }
 

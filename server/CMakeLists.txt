@@ -15,6 +15,7 @@ set(REPOSITORIES
         repositories/ItemsRepository.cpp
         repositories/ItemTagsRepository.cpp
         repositories/FeedRepository.cpp
+        repositories/NotificationRepository.cpp
 )
 
 set(SERVICES
