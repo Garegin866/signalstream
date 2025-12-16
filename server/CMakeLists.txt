@@ -27,6 +27,7 @@ set(SERVICES
         services/ItemTagService.cpp
         services/AdminService.cpp
         services/RoleService.cpp
+        services/NotificationService.cpp
 )
 
 set(CONTROLLERS
