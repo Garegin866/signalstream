@@ -33,6 +33,8 @@ namespace Const {
     inline constexpr const char* JSON_ATTACHED = "attached";
     inline constexpr const char* JSON_USER_ID  = "userId";
     inline constexpr const char* JSON_MODERS   = "moderators";
+    inline constexpr const char* JSON_NOTIFICATIONS   = "notifications";
+    inline constexpr const char* JSON_READ   = "read";
 
     // -----------------------------
     // Authentication JSON Keys

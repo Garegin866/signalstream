@@ -11,16 +11,22 @@ public:
         ADD_METHOD_TO(ItemTagsController::removeTag, "/items/{1}/tags/{2}", drogon::Delete, AUTH_CHAIN);
     METHOD_LIST_END
 
-    static void attachTag(const drogon::HttpRequestPtr& req,
-                   std::function<void(const drogon::HttpResponsePtr&)>&& cb,
-                   int itemId);
+    static void attachTag(
+            const drogon::HttpRequestPtr& req,
+            std::function<void(const drogon::HttpResponsePtr&)>&& cb,
+            int itemId
+    );
 
-    static void listTags(const drogon::HttpRequestPtr& req,
-                  std::function<void(const drogon::HttpResponsePtr&)>&& cb,
-                  int itemId);
+    static void listTags(
+            const drogon::HttpRequestPtr& req,
+            std::function<void(const drogon::HttpResponsePtr&)>&& cb,
+            int itemId
+    );
 
-    static void removeTag(const drogon::HttpRequestPtr& req,
-                   std::function<void(const drogon::HttpResponsePtr&)>&& cb,
-                   int itemId,
-                   int tagId);
+    static void removeTag(
+            const drogon::HttpRequestPtr& req,
+            std::function<void(const drogon::HttpResponsePtr&)>&& cb,
+            int itemId,
+            int tagId
+    );
 };
