@@ -1,8 +1,11 @@
 #pragma once
+
+#include "core/Error.h"
+#include "dto/ItemDTO.h"
+#include "pagination/Pagination.h"
+
 #include <functional>
 #include <optional>
-#include "../dto/ItemDTO.h"
-#include "../core/Error.h"
 
 class ItemsService {
 public:
@@ -33,6 +36,7 @@ public:
     );
 
     static void listItems(
+            const Pagination& pagination,
             const std::function<void(const std::vector<ItemDTO>&, const AppError&)>& cb
     );
 };

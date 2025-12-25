@@ -93,14 +93,18 @@ void ItemsService::updateItem(
         const std::optional<std::string>& url,
         const std::function<void(const std::optional<ItemDTO>&, const AppError&)>& cb
 ) {
-    auto client = drogon::app().getFastDbClient();
+    auto client = drogon::app().getDbClient();
 
-//    ItemsRepository::updateItem(
-//            client, itemId, title, description, url,
-//            [cb](const std::optional<ItemDTO>& item, const AppError& err) {
-//                cb(item, err);
-//            }
-//    );
+    ItemsRepository::updateItem(
+            client,
+            itemId,
+            title,
+            description,
+            url,
+            [cb](const std::optional<ItemDTO>& item, const AppError& err) {
+                cb(item, err);
+            }
+    );
 }
 
 void ItemsService::deleteItem(
@@ -120,12 +124,14 @@ void ItemsService::deleteItem(
 
 
 void ItemsService::listItems(
+        const Pagination& pagination,
         const std::function<void(const std::vector<ItemDTO>&, const AppError&)>& cb
 ) {
     auto client = drogon::app().getDbClient();
 
     ItemsRepository::listAll(
             client,
+            pagination,
             [cb](const std::vector<ItemDTO>& items, const AppError& err) {
                 cb(items, err);
             }

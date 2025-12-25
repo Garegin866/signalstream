@@ -40,19 +40,22 @@ void ItemsRepository::getItemById(
 void ItemsRepository::updateItem(
         const drogon::orm::DbClientPtr& client,
         int itemId,
-        const std::string& title,
-        const std::string& description,
-        const std::string& url,
+        const std::optional<std::string>& title,
+        const std::optional<std::string>& description,
+        const std::optional<std::string>& url,
         const std::function<void(const std::optional<ItemDTO>&, const AppError&)>& cb
 ) {
     client->execSqlAsync(
-            "UPDATE items "
-            "SET title=$2, description=$3, url=$4 "
-            "WHERE id=$1 "
+            "UPDATE items SET "
+            "title = COALESCE(NULLIF($2, ''), title), "
+            "description = COALESCE(NULLIF($3, ''), description), "
+            "url = COALESCE(NULLIF($4, ''), url), "
+            "updated_at = NOW() "
+            "WHERE id = $1 "
             "RETURNING id, title, description, url;",
             [cb](const drogon::orm::Result& r) {
                 if (r.empty()) {
-                    cb({}, AppError::NotFound("Item not found"));
+                    cb(std::nullopt, AppError::NotFound("Item not found"));
                     return;
                 }
 
@@ -60,9 +63,12 @@ void ItemsRepository::updateItem(
                 cb(M.fromRow(r[0]), AppError{});
             },
             [cb](const std::exception_ptr&) {
-                cb({}, AppError::Database("Database error"));
+                cb(std::nullopt, AppError::Database("Database error"));
             },
-            itemId, title, description, url
+            itemId,
+            title.value_or(""),
+            description.value_or(""),
+            url.value_or("")
     );
 }
 
@@ -92,10 +98,14 @@ void ItemsRepository::deleteItem(
 
 void ItemsRepository::listAll(
         const drogon::orm::DbClientPtr& client,
+        const Pagination& pagination,
         const std::function<void(const std::vector<ItemDTO>&, const AppError&)>& cb
 ) {
     client->execSqlAsync(
-            "SELECT * FROM items ORDER BY id DESC;",
+            "SELECT id, title, description, url, created_at "
+            "FROM items "
+            "ORDER BY created_at DESC "
+            "LIMIT $1::int OFFSET $2::int;",
             [cb](const drogon::orm::Result& r) {
                 std::vector<ItemDTO> items;
                 items.reserve(r.size());
@@ -109,7 +119,8 @@ void ItemsRepository::listAll(
             },
             [cb](const std::exception_ptr&) {
                 cb({}, AppError::Database("Database error"));
-            }
+            },
+            pagination.limit, pagination.offset
     );
 }
 
