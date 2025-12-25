@@ -37,6 +37,7 @@ set(CONTROLLERS
         controllers/ItemsController.cpp
         controllers/AdminController.cpp
         controllers/NotificationController.cpp
+        controllers/DocsController.cpp
 )
 
 set(MIDDLEWARE

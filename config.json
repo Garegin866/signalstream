@@ -6,7 +6,18 @@
     }
   ],
   "app": {
-    "threads_num": 0
+    "threads_num": 0,
+
+    "document_root": "./docs",
+    "file_types": [
+      "gif","png","jpg","js","css","html","ico","swf","xap","apk","cur","xml",
+      "yaml","yml"
+    ],
+
+    "mime": {
+      "application/yaml": ["yaml","yml"]
+    }
+
   },
   "db_clients": [
     {
