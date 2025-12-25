@@ -15,9 +15,9 @@ public:
         int offset = 0;
 
         // limit
-        if (req->getParameter("limit").size()) {
+        if (req->getParameter(Const::JSON_LIMIT).size()) {
             try {
-                limit = std::stoi(req->getParameter("limit"));
+                limit = std::stoi(req->getParameter(Const::JSON_LIMIT));
             } catch (...) {
                 err = AppError::Validation("Invalid limit");
                 return {};
@@ -25,9 +25,9 @@ public:
         }
 
         // offset
-        if (req->getParameter("offset").size()) {
+        if (req->getParameter(Const::JSON_OFFSET).size()) {
             try {
-                offset = std::stoi(req->getParameter("offset"));
+                offset = std::stoi(req->getParameter(Const::JSON_OFFSET));
             } catch (...) {
                 err = AppError::Validation("Invalid offset");
                 return {};

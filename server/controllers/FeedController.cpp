@@ -4,6 +4,7 @@
 #include "services/FeedService.h"
 #include "core/Response.h"
 #include "core/RequestContextHelpers.h"
+#include "pagination/PaginationParser.h"
 
 void FeedController::getFeed(
         const HttpRequestPtr& req,
@@ -11,17 +12,25 @@ void FeedController::getFeed(
 ) {
     REQUIRE_AUTH_USER(req, callback, user)
 
+    AppError err;
+    Pagination pagination = PaginationParser::parse(req, err);
+    if (err.hasError()) {
+        callback(makeErrorResponse(err));
+        return;
+    }
+
     FeedService::getFeed(
             user.id,
-            [callback](const std::vector<FeedItemDTO>& items, const AppError& err) {
+            pagination,
+            [callback, pagination](const std::vector<FeedItemDTO>& items, const AppError& err) {
                 Json::Value out(Json::arrayValue);
 
                 for (const auto& item : items) {
-                    Json::Value v;
-                    v[Const::JSON_ID] = item.id;
-                    v[Const::JSON_TITLE] = item.title;
-                    v[Const::JSON_DESC] = item.description;
-                    v[Const::JSON_URL] = item.url;
+                    Json::Value value;
+                    value[Const::JSON_ID] = item.id;
+                    value[Const::JSON_TITLE] = item.title;
+                    value[Const::JSON_DESC] = item.description;
+                    value[Const::JSON_URL] = item.url;
 
                     Json::Value tags(Json::arrayValue);
                     for (const auto& t : item.tags) {
@@ -31,11 +40,20 @@ void FeedController::getFeed(
                         tags.append(tv);
                     }
 
-                    v[Const::JSON_TAGS] = tags;
-                    out.append(v);
+                    value[Const::JSON_TAGS] = tags;
+
+                    out.append(value);
                 }
 
-                callback(jsonOK(out));
+                Json::Value meta;
+                meta[Const::JSON_LIMIT] = pagination.limit;
+                meta[Const::JSON_OFFSET] = pagination.offset;
+
+                Json::Value body(Json::objectValue);
+                body[Const::JSON_ITEMS] = out;
+                body[Const::JSON_META] = meta;
+
+                callback(jsonOK(body));
             }
     );
 }
