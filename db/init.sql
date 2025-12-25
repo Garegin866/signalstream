@@ -38,3 +38,16 @@ CREATE TABLE IF NOT EXISTS item_tags (
     tag_id INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
     PRIMARY KEY (item_id, tag_id)
 );
+
+CREATE TABLE IF NOT EXISTS notifications (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    type TEXT NOT NULL,
+    message TEXT NOT NULL,
+    entity_type TEXT NOT NULL,
+    entity_id INTEGER NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    read_at TIMESTAMP NULL,
+
+    UNIQUE (user_id, entity_type, entity_id)
+);

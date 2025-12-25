@@ -8,6 +8,4 @@ struct ItemDTO {
     std::string title;
     std::string description;
     std::string url;
-    std::string createdAt;
-    std::vector<TagDTO> tags;
 };

@@ -37,9 +37,8 @@ Content curator.
 
 **Can:**
 - Everything a User can do.
-- Create/delete tags.
+- Create tags.
 - Create/edit/delete items.
-- Attach tags to items.
 
 **Cannot:**
 - View all users.

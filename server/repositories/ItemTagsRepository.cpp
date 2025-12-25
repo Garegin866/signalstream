@@ -1,43 +1,41 @@
 #include "ItemTagsRepository.h"
 
 #include "core/Constants.h"
+#include "core/SqlUtils.h"
 #include "mappers/MapperRegistry.h"
 #include "mappers/ItemMapper.h"
 
-// -----------------------------------------------------
-// 1. ATTACH TAG TO ITEM
-// -----------------------------------------------------
-void ItemTagsRepository::attachTagToItem(
+void ItemTagsRepository::attachTagsToItem(
         const drogon::orm::DbClientPtr& client,
         int itemId,
-        int tagId,
+        const std::vector<int>& tagIds,
         const std::function<void(bool, const AppError&)>& cb
 ) {
+    if (tagIds.empty()) {
+        cb(true, AppError{});
+        return;
+    }
+
+    std::string sql = "INSERT INTO item_tags(item_id, tag_id) "
+                      "SELECT $1, x "
+                      "FROM unnest($2::bigint[]) AS x "
+                      "ON CONFLICT DO NOTHING";
+
+    const std::string arr = SqlUtils::toPgIntArrayLiteral(tagIds);
+
     client->execSqlAsync(
-            "INSERT INTO item_tags (item_id, tag_id) VALUES ($1, $2);",
+            sql,
             [cb](const drogon::orm::Result&) {
                 cb(true, AppError{});
             },
-            [cb](const std::exception_ptr& eptr) {
-                try {
-                    if (eptr) std::rethrow_exception(eptr);
-                } catch (const std::exception &e) {
-                    std::string msg = e.what();
-                    if (msg.find("duplicate key") != std::string::npos) {
-                        cb(false, AppError::Duplicate("Tag already attached"));
-                        return;
-                    }
-                    cb({}, AppError::Database("Database error"));
-                }
+            [cb](const std::exception_ptr&) {
+                cb(false, AppError::Database("Failed to attach tags to item"));
             },
-            itemId, tagId
+            itemId,
+            arr
     );
 }
 
-
-// -----------------------------------------------------
-// 2. LIST TAGS FOR ITEM
-// -----------------------------------------------------
 void ItemTagsRepository::listTagsForItem(
         const drogon::orm::DbClientPtr& client,
         int itemId,
@@ -69,10 +67,6 @@ void ItemTagsRepository::listTagsForItem(
     );
 }
 
-
-// -----------------------------------------------------
-// 3. LIST ITEMS FOR A TAG (Optional helper)
-// -----------------------------------------------------
 void ItemTagsRepository::listItemsForTag(
         const drogon::orm::DbClientPtr& client,
         int tagId,
@@ -99,27 +93,5 @@ void ItemTagsRepository::listItemsForTag(
                 cb({}, AppError::Database("Database error"));
             },
             tagId
-    );
-}
-
-
-// -----------------------------------------------------
-// 4. REMOVE TAG FROM ITEM
-// -----------------------------------------------------
-void ItemTagsRepository::removeTagFromItem(
-        const drogon::orm::DbClientPtr& client,
-        int itemId,
-        int tagId,
-        const std::function<void(bool, const AppError&)>& cb
-) {
-    client->execSqlAsync(
-            "DELETE FROM item_tags WHERE item_id = $1 AND tag_id = $2;",
-            [cb](const drogon::orm::Result&) {
-                cb(true, AppError{});
-            },
-            [cb](const std::exception_ptr&) {
-                cb(false, AppError::Database("Database error"));
-            },
-            itemId, tagId
     );
 }

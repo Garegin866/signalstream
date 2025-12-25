@@ -1,66 +1,75 @@
 #include "ItemsService.h"
-#include "../repositories/ItemsRepository.h"
+
+#include "repositories/ItemsRepository.h"
+#include "repositories/UserTagsRepository.h"
+#include "repositories/ItemTagsRepository.h"
+#include "repositories/NotificationRepository.h"
+
 #include <drogon/drogon.h>
-
-// ---------------- VALIDATION HELPERS ----------------
-
-static bool isEmpty(const std::string& s) {
-    return s.empty() || s.find_first_not_of(" \t\n\r") == std::string::npos;
-}
-
-static AppError validateItemFields(
-        const std::string& title,
-        const std::string& description,
-        const std::string& url
-) {
-    if (isEmpty(title)) {
-        return AppError::Validation("Title is required");
-    }
-    if (title.size() > 200) {
-        return AppError::Validation("Title is too long");
-    }
-    if (description.size() > 2000) {
-        return AppError::Validation("Description is too long");
-    }
-    if (url.size() > 500) {
-        return AppError::Validation("URL is too long");
-    }
-    return AppError{}; // OK
-}
-
-
-// ---------------- SERVICE IMPLEMENTATION ----------------
 
 void ItemsService::createItem(
         const std::string& title,
         const std::string& description,
         const std::string& url,
+        const std::vector<int>& tagIds,
         const std::function<void(const ItemDTO&, const AppError&)>& cb
 ) {
-    // 1. Validate
-    AppError err = validateItemFields(title, description, url);
-    if (err.hasError()) {
-        cb({}, err);
-        return;
-    }
-
-    // 2. Create
     auto client = drogon::app().getDbClient();
+
     ItemsRepository::createItem(
-            client,
-            title,
-            description,
-            url,
-            [cb](const ItemDTO& item, const AppError& repoErr) {
-                if (repoErr.hasError()) {
-                    cb({}, repoErr);
+            client, title, description, url,
+            [client, tagIds, cb](const ItemDTO& created, const AppError& err) {
+                if (err.hasError()) {
+                    cb({}, err);
                     return;
                 }
-                cb(item, AppError{});
+
+                if (tagIds.empty()) {
+                    cb(created, {});
+                    return;
+                }
+
+                ItemTagsRepository::attachTagsToItem(
+                        client,
+                        created.id,
+                        tagIds,
+                        [client, created, tagIds, cb](bool ok, const AppError& err2) {
+                            if (err2.hasError()) {
+                                cb({}, err2);
+                                return;
+                            }
+
+                            UserTagsRepository::findUsersByTagIds(
+                                    client,
+                                    tagIds,
+                                    [client, created, cb](const std::vector<int>& userIds, const AppError& err3) {
+                                        if (err3.hasError()) {
+                                            cb({}, err3);
+                                            return;
+                                        }
+
+                                        NotificationRepository::insertBulkForUsers(
+                                                client,
+                                                userIds,
+                                                "item_created",
+                                                "A new item has been added: " + created.title,
+                                                "item",
+                                                created.id,
+                                                [created, cb](const AppError& err4) {
+                                                    if (err4.hasError()) {
+                                                        LOG_ERROR << "Notification insert failed: " << err4.message;
+                                                    }
+
+                                                    cb(created, {});
+                                                }
+                                        );
+                                    }
+                            );
+                        }
+                );
             }
     );
 }
-
 
 void ItemsService::getItem(
         int itemId,
@@ -77,47 +86,34 @@ void ItemsService::getItem(
     );
 }
 
-
 void ItemsService::updateItem(
         int itemId,
-        const std::string& title,
-        const std::string& description,
-        const std::string& url,
+        const std::optional<std::string>& title,
+        const std::optional<std::string>& description,
+        const std::optional<std::string>& url,
         const std::function<void(const std::optional<ItemDTO>&, const AppError&)>& cb
 ) {
-    // 1. Validate
-    AppError err = validateItemFields(title, description, url);
-    if (err.hasError()) {
-        cb(std::nullopt, err);
-        return;
-    }
+    auto client = drogon::app().getFastDbClient();
 
-    // 2. Update
-    auto client = drogon::app().getDbClient();
-    ItemsRepository::updateItem(
-            client,
-            itemId,
-            title,
-            description,
-            url,
-            [cb](const std::optional<ItemDTO>& item, const AppError& repoErr) {
-                cb(item, repoErr);
-            }
-    );
+//    ItemsRepository::updateItem(
+//            client, itemId, title, description, url,
+//            [cb](const std::optional<ItemDTO>& item, const AppError& err) {
+//                cb(item, err);
+//            }
+//    );
 }
-
 
 void ItemsService::deleteItem(
         int itemId,
-        const std::function<void(bool, const AppError&)>& cb
+        const std::function<void(const AppError&)>& cb
 ) {
     auto client = drogon::app().getDbClient();
 
     ItemsRepository::deleteItem(
             client,
             itemId,
-            [cb](bool ok, const AppError& err) {
-                cb(ok, err);
+            [cb](const AppError& err) {
+                cb(err);
             }
     );
 }

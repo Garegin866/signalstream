@@ -19,4 +19,10 @@ public:
             int userId,
             const std::function<void(const std::vector<TagDTO>&, const AppError&)>& cb
     );
+
+    static void findUsersByTagIds(
+            const drogon::orm::DbClientPtr& client,
+            const std::vector<int> &tagIds,
+            const std::function<void(const std::vector<int>&, const AppError&)>& cb
+    );
 };

@@ -39,7 +39,7 @@ public:
     static void deleteItem(
             const drogon::orm::DbClientPtr& client,
             int itemId,
-            const std::function<void(bool, const AppError&)>& cb
+            const std::function<void(const AppError&)>& cb
     );
 
     static void listAll(

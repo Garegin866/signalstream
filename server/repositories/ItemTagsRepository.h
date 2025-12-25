@@ -10,10 +10,10 @@
 
 class ItemTagsRepository {
 public:
-    static void attachTagToItem(
+    static void attachTagsToItem(
             const drogon::orm::DbClientPtr& client,
             int itemId,
-            int tagId,
+            const std::vector<int>& tagIds,
             const std::function<void(bool, const AppError&)>& cb
     );
 
@@ -27,12 +27,5 @@ public:
             const drogon::orm::DbClientPtr& client,
             int tagId,
             const std::function<void(const std::vector<ItemDTO>&, const AppError&)>& cb
-    );
-
-    static void removeTagFromItem(
-            const drogon::orm::DbClientPtr& client,
-            int itemId,
-            int tagId,
-            const std::function<void(bool, const AppError&)>& cb
     );
 };

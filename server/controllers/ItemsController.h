@@ -13,21 +13,31 @@ public:
         ADD_METHOD_TO(ItemsController::deleteItem, "/items/{1}", drogon::Delete, AUTH_CHAIN);
     METHOD_LIST_END
 
-    static void createItem(const drogon::HttpRequestPtr& req,
-                    std::function<void(const drogon::HttpResponsePtr&)>&& cb);
+    static void createItem(
+            const drogon::HttpRequestPtr& req,
+            std::function<void(const drogon::HttpResponsePtr&)>&& cb
+    );
 
-    static void getItem(const drogon::HttpRequestPtr& req,
-                 std::function<void(const drogon::HttpResponsePtr&)>&& cb,
-                 int itemId);
+    static void getItem(
+            const drogon::HttpRequestPtr& req,
+            std::function<void(const drogon::HttpResponsePtr&)>&& cb,
+            int itemId
+    );
 
-    static void listItems(const drogon::HttpRequestPtr& req,
-                   std::function<void(const drogon::HttpResponsePtr&)>&& cb);
+    static void listItems(
+            const drogon::HttpRequestPtr& req,
+            std::function<void(const drogon::HttpResponsePtr&)>&& cb
+    );
 
-    static void updateItem(const drogon::HttpRequestPtr& req,
-                    std::function<void(const drogon::HttpResponsePtr&)>&& cb,
-                    int itemId);
+    static void updateItem(
+            const drogon::HttpRequestPtr& req,
+            std::function<void(const drogon::HttpResponsePtr&)>&& cb,
+            int itemId
+    );
 
-    static void deleteItem(const drogon::HttpRequestPtr& req,
-                    std::function<void(const drogon::HttpResponsePtr&)>&& cb,
-                    int itemId);
+    static void deleteItem(
+            const drogon::HttpRequestPtr& req,
+            std::function<void(const drogon::HttpResponsePtr&)>&& cb,
+            int itemId
+    );
 };
