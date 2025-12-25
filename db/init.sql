@@ -51,3 +51,12 @@ CREATE TABLE IF NOT EXISTS notifications (
 
     UNIQUE (user_id, entity_type, entity_id)
 );
+
+CREATE INDEX idx_user_tags_user_id_tag_id
+    ON user_tags(user_id, tag_id);
+
+CREATE INDEX idx_item_tags_tag_id_item_id
+    ON item_tags(tag_id, item_id);
+
+CREATE INDEX idx_items_created_at
+    ON items(created_at DESC);

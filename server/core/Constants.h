@@ -17,6 +17,13 @@ namespace Const {
     inline constexpr const char* ATTR_TOKEN   = "token";
 
     // -----------------------------
+    // Meta JSON Keys
+    // -----------------------------
+    inline constexpr const char* JSON_META = "meta";
+    inline constexpr const char* JSON_LIMIT = "limit";
+    inline constexpr const char* JSON_OFFSET = "offset";
+
+    // -----------------------------
     // JSON Field Keys (Shared)
     // -----------------------------
     inline constexpr const char* JSON_ERROR    = "error";

@@ -1,54 +1,78 @@
 #include "FeedRepository.h"
 
 #include "core/Constants.h"
+#include "core/SqlUtils.h"
 
 void FeedRepository::getFeedForUser(
         const drogon::orm::DbClientPtr& client,
         int userId,
+        const Pagination& pagination,
         const std::function<void(const std::vector<FeedItemDTO>&, const AppError&)>& cb
 ) {
     client->execSqlAsync(
-            "SELECT i.id AS item_id, i.title, i.description, i.url, "
-            "       t.id AS tag_id, t.name AS tag_name "
+            "SELECT i.id, i.title, i.description, i.url, i.created_at "
             "FROM items i "
-            "JOIN item_tags it ON i.id = it.item_id "
-            "JOIN tags t ON it.tag_id = t.id "
-            "WHERE it.tag_id IN (SELECT tag_id FROM user_tags WHERE user_id = $1) "
-            "ORDER BY i.id DESC;",
-            [cb](const drogon::orm::Result& r) {
-                std::unordered_map<int, FeedItemDTO> items;
-
-                for (const auto& row : r) {
-                    int itemId = row[Const::COL_ITEM_ID].as<int>();
-
-                    // Create item if not exists
-                    if (!items.count(itemId)) {
-                        FeedItemDTO dto;
-                        dto.id = itemId;
-                        dto.title = row[Const::COL_TITLE].as<std::string>();
-                        dto.description = row[Const::COL_DESCRIPTION].as<std::string>();
-                        dto.url = row[Const::COL_URL].as<std::string>();
-                        items[itemId] = dto;
-                    }
-
-                    // Add tag
-                    TagDTO tag;
-                    tag.id = row[Const::COL_TAG_ID].as<int>();
-                    tag.name = row[Const::COL_TAG_NAME].as<std::string>();
-                    items[itemId].tags.push_back(tag);
+            "WHERE EXISTS ( "
+            "   SELECT 1 FROM item_tags it "
+            "   JOIN user_tags ut ON ut.tag_id = it.tag_id "
+            "   WHERE it.item_id = i.id AND ut.user_id = $1 "
+            ") "
+            "ORDER BY i.created_at DESC "
+            "LIMIT $2::int OFFSET $3::int;",
+            [client, cb](const drogon::orm::Result& r) {
+                if (r.empty()) {
+                    cb({}, AppError{});
+                    return;
                 }
 
-                // Convert map → vector
-                std::vector<FeedItemDTO> result;
-                result.reserve(items.size());
-                for (auto& p : items)
-                    result.push_back(std::move(p.second));
+                std::vector<FeedItemDTO> items;
+                items.reserve(r.size());
+                std::vector<int> itemIds;
+                itemIds.reserve(r.size());
 
-                cb(result, AppError{});
+                for (const auto& row : r) {
+                    FeedItemDTO dto;
+                    dto.id = row["id"].as<int>();
+                    dto.title = row["title"].as<std::string>();
+                    dto.description = row["description"].as<std::string>();
+                    dto.url = row["url"].as<std::string>();
+                    items.push_back(dto);
+                    itemIds.push_back(dto.id);
+                }
+
+                const std::string pgArr = SqlUtils::toPgIntArrayLiteral(itemIds);
+
+                client->execSqlAsync(
+                        "SELECT it.item_id, t.id, t.name "
+                        "FROM item_tags it "
+                        "JOIN tags t ON t.id = it.tag_id "
+                        "WHERE it.item_id = ANY($1::int[]);",
+                        [items = std::move(items), cb](const drogon::orm::Result& tr) mutable {
+                            std::unordered_map<int, size_t> index;
+                            for (size_t i = 0; i < items.size(); ++i)
+                                index[items[i].id] = i;
+
+                            for (const auto& row : tr) {
+                                int itemId = row["item_id"].as<int>();
+                                TagDTO tag;
+                                tag.id = row["id"].as<int>();
+                                tag.name = row["name"].as<std::string>();
+                                items[index[itemId]].tags.push_back(tag);
+                            }
+
+                            cb(items, AppError{});
+                        },
+                        [cb](const std::exception_ptr&) {
+                            cb({}, AppError::Database("Failed to load tags"));
+                        },
+                        pgArr
+                );
             },
             [cb](const std::exception_ptr&) {
-                cb({}, AppError::Database("Database error"));
+                cb({}, AppError::Database("Failed to load feed"));
             },
-            userId
+            userId,
+            pagination.limit,
+            pagination.offset
     );
 }
