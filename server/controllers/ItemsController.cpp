@@ -16,16 +16,31 @@ void ItemsController::createItem(
 
     auto json = req->getJsonObject();
     if (!json || !json->isMember(Const::JSON_TITLE)) {
-        cb(jsonError(400, "title required"));
+        cb(jsonError(400, "Title required"));
         return;
     }
 
     std::string title = (*json)[Const::JSON_TITLE].asString();
+    if (title.empty()) {
+        cb(jsonError(400, "Title cannot be empty"));
+        return;
+    }
+
     std::string description = json->get(Const::JSON_DESC, "").asString();
     std::string url = json->get(Const::JSON_URL, "").asString();
 
+    std::vector<int> tagIds;
+    if (json->isMember("tags") && (*json)["tags"].isArray()) {
+        for (auto &t : (*json)["tags"]) {
+            if (t.isInt()) tagIds.push_back(t.asInt());
+        }
+    }
+
     ItemsService::createItem(
-            title, description, url,
+            title,
+            description,
+            url,
+            tagIds,
             [cb](const ItemDTO& item, const AppError& err) {
                 if (err.hasError()) {
                     cb(makeErrorResponse(err));
@@ -103,9 +118,20 @@ void ItemsController::updateItem(
         return;
     }
 
-    std::string title = json->get(Const::JSON_TITLE, "").asString();
-    std::string description = json->get(Const::JSON_DESC, "").asString();
-    std::string url = json->get(Const::JSON_URL, "").asString();
+    std::optional<std::string> title;
+    if (json->isMember(Const::JSON_TITLE)) {
+        title = (*json)[Const::JSON_TITLE].asString();
+    }
+
+    std::optional<std::string> description;
+    if (json->isMember(Const::JSON_DESC)) {
+        description = (*json)[Const::JSON_DESC].asString();
+    }
+
+    std::optional<std::string> url;
+    if (json->isMember(Const::JSON_URL)) {
+        url = (*json)[Const::JSON_URL].asString();
+    }
 
     ItemsService::updateItem(
             itemId, title, description, url,
@@ -136,14 +162,14 @@ void ItemsController::deleteItem(
 
     ItemsService::deleteItem(
             itemId,
-            [cb](bool ok, const AppError& err) {
+            [cb](const AppError& err) {
                 if (err.hasError()) {
                     cb(makeErrorResponse(err));
                     return;
                 }
 
                 Json::Value r;
-                r[Const::JSON_DELETED] = ok;
+                r[Const::JSON_DELETED] = true;
 
                 cb(jsonOK(r));
             }

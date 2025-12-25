@@ -8,5 +8,7 @@ struct NotificationDTO {
     std::string type;
     std::string message;
     std::string createdAt;
+    std::string entityType;
+    int entityId = 0;
     std::optional<std::string> readAt;
 };

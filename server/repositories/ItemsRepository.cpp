@@ -20,7 +20,7 @@ void ItemsRepository::getItemById(
         const std::function<void(const std::optional<ItemDTO>&, const AppError&)>& cb
 ) {
     client->execSqlAsync(
-            "SELECT id, title, description, url FROM items WHERE id=$1;",
+            "SELECT * FROM items WHERE id=$1;",
             [cb](const drogon::orm::Result& r) {
                 if (r.empty()) {
                     cb(std::nullopt, AppError{});
@@ -69,15 +69,22 @@ void ItemsRepository::updateItem(
 void ItemsRepository::deleteItem(
         const drogon::orm::DbClientPtr& client,
         int itemId,
-        const std::function<void(bool, const AppError&)>& cb
+        const std::function<void(const AppError&)>& cb
 ) {
     client->execSqlAsync(
-            "DELETE FROM items WHERE id=$1;",
-            [cb](const drogon::orm::Result&) {
-                cb(true, AppError{});
+            "DELETE FROM items "
+            "WHERE id=$1 "
+            "RETURNING id;",
+            [cb](const drogon::orm::Result& r) {
+                if (r.empty()) {
+                    cb(AppError::NotFound("Item not found"));
+                    return;
+                }
+
+                cb(AppError{});
             },
             [cb](const std::exception_ptr&) {
-                cb(false, AppError::Database("Failed to delete item"));
+                cb(AppError::Database("Failed to delete item"));
             },
             itemId
     );
@@ -88,7 +95,7 @@ void ItemsRepository::listAll(
         const std::function<void(const std::vector<ItemDTO>&, const AppError&)>& cb
 ) {
     client->execSqlAsync(
-            "SELECT id, title, description, url FROM items ORDER BY id DESC;",
+            "SELECT * FROM items ORDER BY id DESC;",
             [cb](const drogon::orm::Result& r) {
                 std::vector<ItemDTO> items;
                 items.reserve(r.size());

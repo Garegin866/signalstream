@@ -4,6 +4,8 @@ void NotificationService::sendNotification(
         int userId,
         const std::string &type,
         const std::string &message,
+        const std::string& entityType,
+        int entityId,
         const std::function<void(const NotificationDTO&, const AppError&)>& cb
 ) {
     auto db = drogon::app().getDbClient();
@@ -18,7 +20,7 @@ void NotificationService::sendNotification(
         return;
     }
 
-    NotificationRepository::insert(db, userId, type, message, cb);
+    NotificationRepository::insert(db, userId, type, message, entityType, entityId, cb);
 }
 
 

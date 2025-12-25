@@ -13,6 +13,8 @@ public:
             int userId,
             const std::string &type,
             const std::string &message,
+            const std::string& entityType,
+            int entityId,
             const std::function<void(const NotificationDTO&, const AppError&)>& cb
     );
 

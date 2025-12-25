@@ -65,6 +65,8 @@ namespace Const {
     inline constexpr const char* COL_TOKEN         = "token";
     inline constexpr const char* COL_TYPE          = "type";
     inline constexpr const char* COL_MESSAGE       = "message";
+    inline constexpr const char* COL_ENTITY_TYPE   = "entity_type";
+    inline constexpr const char* COL_ENTITY_ID     = "entity_id";
     inline constexpr const char* COL_CREATED_AT    = "created_at";
     inline constexpr const char* COL_READ_AT       = "read_at";
     inline constexpr const char* COL_TITLE         = "title";

@@ -12,6 +12,7 @@ public:
         dto.title = row[Const::COL_TITLE].as<std::string>();
         dto.description = row[Const::COL_DESCRIPTION].as<std::string>();
         dto.url = row[Const::COL_URL].as<std::string>();
+
         return dto;
     }
 

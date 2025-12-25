@@ -73,7 +73,7 @@ void AuthController::me(
         const HttpRequestPtr& req,
         std::function<void(const HttpResponsePtr&)>&& callback
 ) {
-    REQUIRE_AUTH_USER(req, callback, user);
+    REQUIRE_AUTH_USER(req, callback, user)
 
     auto& M = MapperRegistry<UserDTO, UserMapper>::get();
     Json::Value body = M.toJson(user);
@@ -85,7 +85,7 @@ void AuthController::logout(
         const HttpRequestPtr &req,
         std::function<void(const HttpResponsePtr&)> &&callback
 ) {
-    REQUIRE_AUTH_USER_WITH_TOKEN(req, callback, user, token);
+    REQUIRE_AUTH_USER_WITH_TOKEN(req, callback, user, token)
 
     AuthService::logout(
             token,

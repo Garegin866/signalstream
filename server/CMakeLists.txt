@@ -24,7 +24,6 @@ set(SERVICES
         services/UserTagService.cpp
         services/FeedService.cpp
         services/ItemsService.cpp
-        services/ItemTagService.cpp
         services/AdminService.cpp
         services/RoleService.cpp
         services/NotificationService.cpp
@@ -35,9 +34,9 @@ set(CONTROLLERS
         controllers/AuthController.cpp
         controllers/UserTagController.cpp
         controllers/FeedController.cpp
-        controllers/ItemTagsController.cpp
         controllers/ItemsController.cpp
         controllers/AdminController.cpp
+        controllers/NotificationController.cpp
 )
 
 set(MIDDLEWARE

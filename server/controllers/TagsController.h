@@ -6,8 +6,8 @@
 class TagsController : public drogon::HttpController<TagsController> {
 public:
     METHOD_LIST_BEGIN
-    ADD_METHOD_TO(TagsController::listTags, "/tags", drogon::Get, PUBLIC);
-    ADD_METHOD_TO(TagsController::createTag, "/tags", drogon::Post, AUTH_CHAIN);
+        ADD_METHOD_TO(TagsController::listTags, "/tags", drogon::Get, PUBLIC);
+        ADD_METHOD_TO(TagsController::createTag, "/tags", drogon::Post, AUTH_CHAIN);
     METHOD_LIST_END
 
     static void listTags(

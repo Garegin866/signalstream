@@ -10,6 +10,7 @@ public:
             const std::string& title,
             const std::string& description,
             const std::string& url,
+            const std::vector<int>& tagIds,
             const std::function<void(const ItemDTO&, const AppError&)>& cb
     );
 
@@ -20,15 +21,15 @@ public:
 
     static void updateItem(
             int itemId,
-            const std::string& title,
-            const std::string& description,
-            const std::string& url,
+            const std::optional<std::string>& title,
+            const std::optional<std::string>& description,
+            const std::optional<std::string>& url,
             const std::function<void(const std::optional<ItemDTO>&, const AppError&)>& cb
     );
 
     static void deleteItem(
             int itemId,
-            const std::function<void(bool, const AppError&)>& cb
+            const std::function<void(const AppError&)>& cb
     );
 
     static void listItems(
