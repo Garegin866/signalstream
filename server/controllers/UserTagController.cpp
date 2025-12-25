@@ -10,9 +10,7 @@ void UserTagController::attach(
         const drogon::HttpRequestPtr &req,
         std::function<void(const drogon::HttpResponsePtr&)> &&callback
 ) {
-    using namespace drogon;
-
-    REQUIRE_AUTH_USER(req, callback, user);
+    REQUIRE_AUTH_USER(req, callback, user)
 
     auto json = req->getJsonObject();
     if (!json || !json->isMember(Const::JSON_TAG_ID)) {
@@ -48,7 +46,7 @@ void UserTagController::list(
         const HttpRequestPtr& req,
         std::function<void(const HttpResponsePtr&)>&& callback
 ) {
-    REQUIRE_AUTH_USER(req, callback, user);
+    REQUIRE_AUTH_USER(req, callback, user)
 
     UserTagService::listUserTags(
             user.id,

@@ -12,6 +12,8 @@ public:
             int userId,
             const std::string &type,
             const std::string &message,
+            const std::string& entityType,
+            int entityId,
             const std::function<void(const NotificationDTO&, const AppError&)>& cb
     );
 
@@ -24,6 +26,16 @@ public:
     static void markRead(
             const drogon::orm::DbClientPtr& client,
             int notificationId,
+            const std::function<void(const AppError&)>& cb
+    );
+
+    static void insertBulkForUsers(
+            const drogon::orm::DbClientPtr& client,
+            const std::vector<int>& userIds,
+            const std::string& type,
+            const std::string& message,
+            const std::string& entityType,
+            int entityId,
             const std::function<void(const AppError&)>& cb
     );
 };

@@ -2,7 +2,8 @@
 
 #include <drogon/orm/Exception.h>
 
-#include "../core/Constants.h"
+#include "core/Constants.h"
+#include "core/SqlUtils.h"
 
 void UserTagsRepository::attach(
         const drogon::orm::DbClientPtr& client,
@@ -64,5 +65,37 @@ void UserTagsRepository::listForUser(
                 cb({}, AppError::Database("Database error"));
             },
             userId
+    );
+}
+
+void UserTagsRepository::findUsersByTagIds(
+        const drogon::orm::DbClientPtr& client,
+        const std::vector<int> &tagIds,
+        const std::function<void(const std::vector<int>&, const AppError&)>& cb
+) {
+    if (tagIds.empty()) {
+        cb({}, AppError{});
+        return;
+    }
+
+    const std::string pgArr = SqlUtils::toPgIntArrayLiteral(tagIds);
+
+    client->execSqlAsync(
+            "SELECT DISTINCT user_id "
+            "FROM user_tags "
+            "WHERE tag_id = ANY($1::int[]);",
+            [cb](const drogon::orm::Result& res) {
+                std::vector<int> userIds;
+                userIds.reserve(res.size());
+
+                for (const auto& row : res) {
+                    userIds.push_back(row[Const::COL_USER_ID].as<int>());
+                }
+                cb(userIds, AppError{});
+            },
+            [cb](const std::exception_ptr&) {
+                cb({}, AppError::Database("Database error"));
+            },
+            pgArr
     );
 }

@@ -1,23 +1,23 @@
-#include "NotificationsController.h"
+#include "NotificationController.h"
 
 #include "core/RequestContextHelpers.h"
 #include "core/Response.h"
 #include "core/Constants.h"
 #include "services/NotificationService.h"
 #include "dto/NotificationDTO.h"
-#include "mapper/MapperRegistry.h"
-#include "mapper/NotificationMapper.h"
+#include "mappers/MapperRegistry.h"
+#include "mappers/NotificationMapper.h"
 
 void NotificationsController::listNotifications(
         const HttpRequestPtr &req,
         std::function<void(const HttpResponsePtr &)> &&callback
 ) {
-    REQUIRE_AUTH_USER(req, callback, user);
+    REQUIRE_AUTH_USER(req, callback, user)
 
     NotificationService::listNotifications(
             user.id,
             [callback](const std::vector<NotificationDTO> &list, const AppError &err) {
-                if (err.isError()) {
+                if (err.hasError()) {
                     callback(makeErrorResponse(err));
                     return;
                 }
@@ -40,7 +40,7 @@ void NotificationsController::markRead(
         const HttpRequestPtr &req,
         std::function<void(const HttpResponsePtr &)> &&callback
 ) {
-    REQUIRE_AUTH_USER(req, callback, user);
+    REQUIRE_AUTH_USER(req, callback, user)
 
     auto json = req->getJsonObject();
     if (!json || !(*json).isMember(Const::JSON_ID)) {
@@ -52,9 +52,9 @@ void NotificationsController::markRead(
 
     NotificationService::markAsRead(
             notificationId,
-            userId,
+            user.id,
             [callback](const AppError &err) {
-                if (err.isError()) {
+                if (err.hasError()) {
                     callback(makeErrorResponse(err));
                     return;
                 }

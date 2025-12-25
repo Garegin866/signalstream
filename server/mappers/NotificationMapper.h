@@ -15,6 +15,8 @@ public:
         dto.userId    = row[Const::COL_USER_ID].as<int>();
         dto.type      = row[Const::COL_TYPE].as<std::string>();
         dto.message   = row[Const::COL_MESSAGE].as<std::string>();
+        dto.entityType = row[Const::COL_ENTITY_TYPE].as<std::string>();
+        dto.entityId   = row[Const::COL_ENTITY_ID].as<int>();
         dto.createdAt = row[Const::COL_CREATED_AT].as<std::string>();
 
         if (!row[Const::COL_READ_AT].isNull())

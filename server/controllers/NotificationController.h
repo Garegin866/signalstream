@@ -9,12 +9,12 @@ public:
         ADD_METHOD_TO(NotificationsController::markRead, "/notifications/read", drogon::Post);
     METHOD_LIST_END
 
-    void listNotifications(
+    static void listNotifications(
             const drogon::HttpRequestPtr &req,
             std::function<void(const drogon::HttpResponsePtr&)> &&callback
     );
 
-    void markRead(
+    static void markRead(
             const drogon::HttpRequestPtr &req,
             std::function<void(const drogon::HttpResponsePtr&)> &&callback
     );
