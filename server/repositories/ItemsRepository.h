@@ -1,9 +1,13 @@
 #pragma once
+
+#include "dto/ItemDTO.h"
+#include "core/Error.h"
+#include "pagination/Pagination.h"
+
 #include <optional>
 #include <vector>
+
 #include <drogon/orm/DbClient.h>
-#include "../dto/ItemDTO.h"
-#include "../core/Error.h"
 
 class ItemsRepository {
 public:
@@ -30,9 +34,9 @@ public:
     static void updateItem(
             const drogon::orm::DbClientPtr& client,
             int itemId,
-            const std::string& title,
-            const std::string& description,
-            const std::string& url,
+            const std::optional<std::string>& title,
+            const std::optional<std::string>& description,
+            const std::optional<std::string>& url,
             const std::function<void(const std::optional<ItemDTO>&, const AppError&)>& cb
     );
 
@@ -44,6 +48,7 @@ public:
 
     static void listAll(
             const drogon::orm::DbClientPtr& client,
+            const Pagination& pagination,
             const std::function<void(const std::vector<ItemDTO>&, const AppError&)>& cb
     );
 };

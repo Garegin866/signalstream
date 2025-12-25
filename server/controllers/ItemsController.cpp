@@ -5,6 +5,7 @@
 #include "core/RequestContextHelpers.h"
 #include "mappers/MapperRegistry.h"
 #include "mappers/ItemMapper.h"
+#include "pagination/PaginationParser.h"
 
 #include <json/json.h>
 
@@ -80,11 +81,19 @@ void ItemsController::getItem(
 
 
 void ItemsController::listItems(
-        const drogon::HttpRequestPtr&,
+        const drogon::HttpRequestPtr& req,
         std::function<void(const drogon::HttpResponsePtr&)>&& cb
 ) {
+    AppError err;
+    Pagination pagination = PaginationParser::parse(req, err);
+    if (err.hasError()) {
+        cb(makeErrorResponse(err));
+        return;
+    }
+
     ItemsService::listItems(
-            [cb](const std::vector<ItemDTO>& items, const AppError& err) {
+            pagination,
+            [cb, pagination](const std::vector<ItemDTO>& items, const AppError& err) {
                 if (err.hasError()) {
                     cb(makeErrorResponse(err));
                     return;
@@ -96,14 +105,18 @@ void ItemsController::listItems(
                     arr.append(M.toJson(item));
                 }
 
+                Json::Value meta;
+                meta[Const::JSON_LIMIT] = pagination.limit;
+                meta[Const::JSON_OFFSET] = pagination.offset;
+
                 Json::Value data;
                 data[Const::JSON_ITEMS] = arr;
+                data[Const::JSON_META] = meta;
 
                 cb(jsonOK(data));
             }
     );
 }
-
 
 void ItemsController::updateItem(
         const drogon::HttpRequestPtr& req,
@@ -131,6 +144,15 @@ void ItemsController::updateItem(
     std::optional<std::string> url;
     if (json->isMember(Const::JSON_URL)) {
         url = (*json)[Const::JSON_URL].asString();
+    }
+
+    if (!title && !description && !url) {
+        AppError err(
+                ErrorType::Validation,
+                "At least one of title, description or url must be provided"
+                );
+        cb(makeErrorResponse(err));
+        return;
     }
 
     ItemsService::updateItem(
