@@ -1,0 +1,67 @@
+Error:
+  type: object
+  properties:
+    error:
+      type: string
+
+PaginationMeta:
+  type: object
+  properties:
+    limit:
+      type: integer
+    offset:
+      type: integer
+
+UserDTO:
+  type: object
+  properties:
+    id: { type: integer }
+    email: { type: string }
+    role:
+      type: string
+      enum: [user, moderator, admin]
+
+SessionDTO:
+  type: object
+  properties:
+    token: { type: string }
+
+TagDTO:
+  type: object
+  properties:
+    id: { type: integer }
+    name: { type: string }
+
+ItemDTO:
+  type: object
+  properties:
+    id: { type: integer }
+    title: { type: string }
+    description: { type: string }
+    url: { type: string }
+
+FeedItemDTO:
+  type: object
+  properties:
+    id: { type: integer }
+    title: { type: string }
+    description: { type: string }
+    url: { type: string }
+    tags:
+      type: array
+      items:
+        $ref: "#/TagDTO"
+
+NotificationDTO:
+  type: object
+  properties:
+    id: { type: integer }
+    type: { type: string }
+    message: { type: string }
+    created_at:
+      type: string
+      format: date-time
+    read_at:
+      type: string
+      format: date-time
+      nullable: true

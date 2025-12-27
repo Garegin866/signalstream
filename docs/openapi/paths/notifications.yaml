@@ -1,0 +1,45 @@
+notifications:
+  get:
+    tags: [Notifications]
+    summary: List notifications
+    security:
+      - BearerAuth: []
+    responses:
+      "200":
+        description: Notifications list
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notifications:
+                  type: array
+                  items:
+                    $ref: "../components/schemas.yaml#/NotificationDTO"
+
+markRead:
+  post:
+    tags: [Notifications]
+    summary: Mark notification as read
+    security:
+      - BearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [id]
+            properties:
+              id:
+                type: integer
+    responses:
+      "200":
+        description: Marked as read
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                read:
+                  type: boolean

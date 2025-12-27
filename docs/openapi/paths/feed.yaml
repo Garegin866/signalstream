@@ -1,0 +1,29 @@
+feed:
+  get:
+    tags: [Feed]
+    summary: Get personalized feed
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      - name: offset
+        in: query
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Feed items
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                items:
+                  type: array
+                  items:
+                    $ref: "../components/schemas.yaml#/FeedItemDTO"
+                meta:
+                  $ref: "../components/schemas.yaml#/PaginationMeta"

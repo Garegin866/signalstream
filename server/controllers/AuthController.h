@@ -6,7 +6,7 @@
 class AuthController : public drogon::HttpController<AuthController> {
 public:
     METHOD_LIST_BEGIN
-        ADD_METHOD_TO(AuthController::registerUser, "/auth/register", drogon::Post, PUBLIC);
+        ADD_METHOD_TO(AuthController::registerUser, "/auth/register", drogon::Post, AUTH_CHAIN);
         ADD_METHOD_TO(AuthController::loginUser, "/auth/login", drogon::Post, PUBLIC);
         ADD_METHOD_TO(AuthController::me, "/auth/me", drogon::Get, AUTH_CHAIN);
         ADD_METHOD_TO(AuthController::logout, "/auth/logout", drogon::Post, AUTH_CHAIN);

@@ -2,6 +2,8 @@
 
 #include "core/Constants.h"
 #include "core/SqlUtils.h"
+#include "mappers/MapperRegistry.h"
+#include "mappers/FeedMapper.h"
 
 void FeedRepository::getFeedForUser(
         const drogon::orm::DbClientPtr& client,
@@ -27,15 +29,14 @@ void FeedRepository::getFeedForUser(
 
                 std::vector<FeedItemDTO> items;
                 items.reserve(r.size());
+
                 std::vector<int> itemIds;
                 itemIds.reserve(r.size());
 
+                auto M = MapperRegistry<FeedItemDTO, FeedMapper>::get();
                 for (const auto& row : r) {
-                    FeedItemDTO dto;
-                    dto.id = row["id"].as<int>();
-                    dto.title = row["title"].as<std::string>();
-                    dto.description = row["description"].as<std::string>();
-                    dto.url = row["url"].as<std::string>();
+                    FeedItemDTO dto = M.fromRow(row);
+
                     items.push_back(dto);
                     itemIds.push_back(dto.id);
                 }

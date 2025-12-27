@@ -1,0 +1,44 @@
+userTags:
+  get:
+    tags: [UserTags]
+    summary: List user followed tags
+    security:
+      - BearerAuth: []
+    responses:
+      "200":
+        description: User tags
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  type: array
+                  items:
+                    $ref: "../components/schemas.yaml#/TagDTO"
+
+  post:
+    tags: [UserTags]
+    summary: Follow a tag
+    security:
+      - BearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [tagId]
+            properties:
+              tagId:
+                type: integer
+    responses:
+      "200":
+        description: Tag attached
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ok:
+                  type: boolean

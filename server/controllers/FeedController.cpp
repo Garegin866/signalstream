@@ -2,6 +2,8 @@
 
 #include "services/AuthService.h"
 #include "services/FeedService.h"
+#include "mappers/MapperRegistry.h"
+#include "mappers/FeedMapper.h"
 #include "core/Response.h"
 #include "core/RequestContextHelpers.h"
 #include "pagination/PaginationParser.h"
@@ -25,24 +27,9 @@ void FeedController::getFeed(
             [callback, pagination](const std::vector<FeedItemDTO>& items, const AppError& err) {
                 Json::Value out(Json::arrayValue);
 
+                auto& M = MapperRegistry<FeedItemDTO, FeedMapper>::get();
                 for (const auto& item : items) {
-                    Json::Value value;
-                    value[Const::JSON_ID] = item.id;
-                    value[Const::JSON_TITLE] = item.title;
-                    value[Const::JSON_DESC] = item.description;
-                    value[Const::JSON_URL] = item.url;
-
-                    Json::Value tags(Json::arrayValue);
-                    for (const auto& t : item.tags) {
-                        Json::Value tv;
-                        tv[Const::JSON_ID] = t.id;
-                        tv[Const::JSON_NAME] = t.name;
-                        tags.append(tv);
-                    }
-
-                    value[Const::JSON_TAGS] = tags;
-
-                    out.append(value);
+                    out.append(M.toJson(item));
                 }
 
                 Json::Value meta;

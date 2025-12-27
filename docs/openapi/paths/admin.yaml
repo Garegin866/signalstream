@@ -1,0 +1,61 @@
+users:
+  get:
+    tags: [Admin]
+    summary: List all users
+    security:
+      - BearerAuth: []
+    responses:
+      "200":
+        description: List of users
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "../components/schemas.yaml#/UserDTO"
+
+moderators:
+  get:
+    tags: [Admin]
+    summary: List moderators
+    security:
+      - BearerAuth: []
+    responses:
+      "200":
+        description: List of moderators
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                moderators:
+                  type: array
+                  items:
+                    $ref: "../components/schemas.yaml#/UserDTO"
+
+setRole:
+  post:
+    tags: [Admin]
+    summary: Change user role
+    security:
+      - BearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [userId, role]
+            properties:
+              userId:
+                type: integer
+              role:
+                type: string
+                enum: [user, moderator, admin]
+    responses:
+      "200":
+        description: Updated user
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas.yaml#/UserDTO"

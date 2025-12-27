@@ -1,6 +1,5 @@
 # 🔐 SignalStream RBAC (Role-Based Access Control)
 
-**Version:** v1.2  
 **Roles:** `user`, `moderator`, `admin`
 
 RBAC defines *who is allowed* to perform *which actions*.  
@@ -10,7 +9,7 @@ SignalStream uses a **3-level hierarchical permission model**:
 user  <  moderator  <  admin
 ```
 
-Higher roles inherit all permissions from lower roles.
+Higher roles inherit **all permissions** from lower roles.
 
 ---
 
@@ -20,15 +19,18 @@ Higher roles inherit all permissions from lower roles.
 Basic end-user.
 
 **Can:**
-- View own profile.
-- Manage own tags.
-- View feed.
-- View items and tags.
+- View own profile (`/auth/me`)
+- Login / logout
+- Manage own followed tags
+- View feed
+- View items and tags
+- Receive and read notifications
 
 **Cannot:**
-- Create tags or items.
-- Edit or delete items.
-- Access admin endpoints.
+- Register new users
+- Create tags
+- Create, edit, or delete items
+- Access admin endpoints
 
 ---
 
@@ -36,15 +38,16 @@ Basic end-user.
 Content curator.
 
 **Can:**
-- Everything a User can do.
-- Create tags.
-- Create/edit/delete items.
+- Everything a **User** can do
+- Create, edit, and delete items
+- Attach tags to items
+- Moderate content quality
 
 **Cannot:**
-- View all users.
-- Change roles.
-- Delete users.
-- Access administrative tools.
+- Create tags
+- View all users
+- Change roles
+- Access administrative endpoints
 
 ---
 
@@ -52,100 +55,75 @@ Content curator.
 Full system authority.
 
 **Can:**
-- Everything a Moderator can do.
-- List all users.
-- Change user roles.
-- Access administrative endpoints.
-- Manage infrastructure-level features (future).
+- Everything a **Moderator** can do
+- Register new users
+- Create tags
+- List all users
+- Promote/demote users
+- View moderators
+- Access all administrative endpoints
+- Manage infrastructure-level features (future)
 
 ---
 
 ## 📚 Endpoint Permission Matrix
 
 | Endpoint | User | Moderator | Admin |
-|---------|------|-----------|-------|
-| **/auth/register** | ✔ | ✔ | ✔ |
-| **/auth/login** | ✔ | ✔ | ✔ |
-| **/auth/logout** | ✔ | ✔ | ✔ |
-| **/auth/me** | ✔ | ✔ | ✔ |
+|--------|------|-----------|-------|
+| **POST /auth/register** | ❌ | ❌ | ✔ |
+| **POST /auth/login** | ✔ | ✔ | ✔ |
+| **POST /auth/logout** | ✔ | ✔ | ✔ |
+| **GET /auth/me** | ✔ | ✔ | ✔ |
 | **GET /feed** | ✔ | ✔ | ✔ |
 | **GET /tags** | ✔ | ✔ | ✔ |
-| **POST /tags** | ❌ | ✔ | ✔ |
-| **DELETE /tags/:id** | ❌ | ✔ | ✔ |
+| **POST /tags** | ❌ | ❌ | ✔ |
+| **POST /user/tags** | ✔ | ✔ | ✔ |
+| **GET /user/tags** | ✔ | ✔ | ✔ |
 | **POST /items** | ❌ | ✔ | ✔ |
 | **PUT /items/:id** | ❌ | ✔ | ✔ |
 | **DELETE /items/:id** | ❌ | ✔ | ✔ |
-| **POST /items/:id/tags** | ❌ | ✔ | ✔ |
+| **GET /items** | ✔ | ✔ | ✔ |
+| **GET /items/:id** | ✔ | ✔ | ✔ |
+| **GET /notifications** | ✔ | ✔ | ✔ |
+| **POST /notifications/read** | ✔ | ✔ | ✔ |
 | **GET /admin/users** | ❌ | ❌ | ✔ |
+| **GET /admin/moderators** | ❌ | ❌ | ✔ |
 | **POST /admin/set-role** | ❌ | ❌ | ✔ |
 
 ---
 
-# 🧩 RBAC Implementation Details
+## 🧩 RBAC Enforcement Strategy
 
-RBAC is enforced at the **controller entry level**, not in services or repositories.
+RBAC is enforced **only at controller entry level**.
 
-### Benefits:
-- Blocks unauthorized users early.
-- Keeps services clean.
-- Prevents duplicated permission checks.
+✔ Controllers validate permissions  
+✔ Services contain **zero role logic**  
+✔ Repositories never check permissions
 
 ---
 
-# 🧱 RBAC Macros
+## 🧱 RBAC Macros
 
 Defined in `core/RequestContextHelpers.h`.
 
----
-
-### ✔ REQUIRE_USER
-
-Ensures the request contains authenticated user context.
-
+### REQUIRE_AUTH_USER
 ```cpp
-REQUIRE_USER(req, fcb);
+REQUIRE_AUTH_USER(req, cb, user);
 ```
 
-Used for:
-- `/auth/me`
-- `/feed`
-- `/user/tags/*`
-
----
-
-### ✔ REQUIRE_ADMIN
-
-Enforces admin-only access.
-
+### REQUIRE_ADMIN
 ```cpp
-REQUIRE_ADMIN(req, fcb);
+REQUIRE_ADMIN(req, cb);
 ```
 
-Used for:
-- `/admin/users`
-- `/admin/set-role`
-
----
-
-### ✔ REQUIRE_MOD_OR_ADMIN
-
-For content-management endpoints.
-
+### REQUIRE_MOD_OR_ADMIN
 ```cpp
-REQUIRE_MOD_OR_ADMIN(req, fcb);
+REQUIRE_MOD_OR_ADMIN(req, cb);
 ```
 
-Used for:
-- Editing/creating/deleting items
-- Creating/deleting tags
-- Item-tag linking
-
 ---
 
-# 🔧 Role Representation
-
-### Enum
-Located in `core/UserRole.h`:
+## 🔧 Role Representation
 
 ```cpp
 enum class UserRole {
@@ -156,44 +134,11 @@ enum class UserRole {
 };
 ```
 
-### Converters
-
-```cpp
-std::string toString(UserRole);
-UserRole fromString(const std::string&);
-```
-
 ---
 
-# 🧠 Permission Philosophy
+## 🛡 Security Guarantees
 
-SignalStream RBAC follows **capability-based permissions**:
-
-- Roles define capabilities.
-- Controllers enforce capabilities.
-- Services remain pure and reusable.
-- Repositories never check permissions.
-
----
-
-# 🧱 Role Hierarchy Summary
-
-```
-Admin
- └── Moderator
-        └── User
-```
-
-Admins inherit moderator + user permissions.  
-Moderators inherit user permissions.
-
----
-
-# 🛡 Security Considerations
-
-✔ Prevent admin from demoting themselves  
-✔ All errors return consistent structured JSON  
-✔ Role parsing is strict  
-✔ Unauthorized access is blocked before DB calls
-
----
+✔ Admin cannot demote themselves  
+✔ Unauthorized access rejected before DB calls  
+✔ Consistent JSON errors  
+✔ No role strings outside RoleService
