@@ -1,0 +1,65 @@
+items:
+  get:
+    tags: [Items]
+    security: []
+    summary: List items (paginated)
+    parameters:
+      - name: limit
+        in: query
+        schema: { type: integer }
+      - name: offset
+        in: query
+        schema: { type: integer }
+    responses:
+      "200":
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                items:
+                  type: array
+                  items:
+                    $ref: "../components/schemas.yaml#/ItemDTO"
+                meta:
+                  $ref: "../components/schemas.yaml#/PaginationMeta"
+
+  post:
+    tags: [Items]
+    summary: Create item (mod/admin)
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [title]
+            properties:
+              title: { type: string }
+              description: { type: string }
+              url: { type: string }
+              tags:
+                type: array
+                items: { type: integer }
+    responses:
+      "200":
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas.yaml#/ItemDTO"
+
+itemById:
+  get:
+    tags: [Items]
+    security: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: integer }
+    responses:
+      "200":
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas.yaml#/ItemDTO"

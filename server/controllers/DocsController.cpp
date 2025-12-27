@@ -7,7 +7,7 @@ void DocsController::redirect(
         std::function<void(const drogon::HttpResponsePtr&)>&& cb
 ) {
     auto resp = drogon::HttpResponse::newRedirectionResponse(
-            "/swagger-ui/index.html"
+            "/openapi/swagger-ui/index.html"
     );
 
     cb(resp);

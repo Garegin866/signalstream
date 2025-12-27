@@ -1,0 +1,56 @@
+login:
+  post:
+    tags: [Auth]
+    security: []
+    summary: Login
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [email, password]
+            properties:
+              email: { type: string }
+              password: { type: string }
+    responses:
+      "200":
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas.yaml#/SessionDTO"
+
+register:
+  post:
+    tags: [Auth]
+    summary: Register user (admin only)
+    responses:
+      "201":
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas.yaml#/UserDTO"
+
+me:
+  get:
+    tags: [Auth]
+    summary: Current user
+    responses:
+      "200":
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas.yaml#/UserDTO"
+
+logout:
+  post:
+    tags: [Auth]
+    summary: Logout
+    responses:
+      "200":
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ok: { type: boolean }

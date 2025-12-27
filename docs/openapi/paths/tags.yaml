@@ -1,0 +1,40 @@
+tags:
+  get:
+    tags: [Tags]
+    summary: List all tags
+    security: []
+    responses:
+      "200":
+        description: Tag list
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  type: array
+                  items:
+                    $ref: "../components/schemas.yaml#/TagDTO"
+
+  post:
+    tags: [Tags]
+    summary: Create tag (admin only)
+    security:
+      - BearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [name]
+            properties:
+              name:
+                type: string
+    responses:
+      "201":
+        description: Created tag
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas.yaml#/TagDTO"

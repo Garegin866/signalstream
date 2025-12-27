@@ -1,0 +1,59 @@
+openapi: 3.0.3
+
+info:
+  title: SignalStream API
+  version: 1.0.0
+  description: Clean C++ backend API (Drogon)
+
+servers:
+  - url: http://localhost:8080
+
+security:
+  - BearerAuth: []
+
+paths:
+  /auth/login:
+    $ref: "./paths/auth.yaml#/login"
+  /auth/register:
+    $ref: "./paths/auth.yaml#/register"
+  /auth/me:
+    $ref: "./paths/auth.yaml#/me"
+  /auth/logout:
+    $ref: "./paths/auth.yaml#/logout"
+
+  /admin/users:
+    $ref: "./paths/admin.yaml#/users"
+  /admin/moderators:
+    $ref: "./paths/admin.yaml#/moderators"
+  /admin/set-role:
+    $ref: "./paths/admin.yaml#/setRole"
+
+  /tags:
+    $ref: "./paths/tags.yaml#/tags"
+
+  /user/tags:
+    $ref: "./paths/user_tags.yaml#/userTags"
+
+  /items:
+    $ref: "./paths/items.yaml#/items"
+  /items/{id}:
+    $ref: "./paths/items.yaml#/itemById"
+
+  /feed:
+    $ref: "./paths/feed.yaml#/feed"
+
+  /notifications:
+    $ref: "./paths/notifications.yaml#/notifications"
+  /notifications/read:
+    $ref: "./paths/notifications.yaml#/markRead"
+
+components:
+  schemas:
+    $ref: "./components/schemas.yaml"
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: UUID
+  responses:
+    $ref: "./components/responses.yaml"
