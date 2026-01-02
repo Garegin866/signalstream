@@ -27,16 +27,12 @@
       "enabled": true
     },
     "email": {
-      "enabled": true,
-      "smtp": {
-        "host": "smtp.gmail.com",
-        "port": 587,
-        "username": "your@email.com",
-        "password": "app_password",
-        "from": "SignalStream <noreply@signalstream.io>",
-        "use_tls": true,
-        "timeout_sec": 5
-      }
+      "host": "127.0.0.1",
+      "port": 1025,
+      "use_tls": false,
+      "username": "",
+      "password": "",
+      "from": "SignalStream <noreply@signalstream.dev>"
     }
   },
 

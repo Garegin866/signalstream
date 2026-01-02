@@ -1,4 +1,5 @@
 #pragma once
+
 #include <string>
 #include <argon2.h>
 #include <random>
