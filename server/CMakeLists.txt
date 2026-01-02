@@ -43,6 +43,7 @@ set(CONTROLLERS
 set(MIDDLEWARE
         middleware/TokenMiddleware.cpp
         middleware/UserContextMiddleware.cpp
+        middleware/RequestLoggingMiddleware.cpp
 )
 
 add_executable(${PROJECT_NAME}

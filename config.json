@@ -5,6 +5,7 @@
       "port": 8080
     }
   ],
+
   "app": {
     "threads_num": 0,
 
@@ -13,12 +14,17 @@
       "gif","png","jpg","js","css","html","ico","swf","xap","apk","cur","xml",
       "yaml","yml"
     ],
-
     "mime": {
       "application/yaml": ["yaml","yml"]
     }
-
   },
+
+  "custom_config": {
+    "logging": {
+      "request": { "enabled": true }
+    }
+  },
+
   "db_clients": [
     {
       "name": "default",
@@ -31,9 +37,5 @@
       "is_fast": false,
       "client_encoding": "utf8"
     }
-  ],
-  "filters": [
-    "TokenMiddleware",
-    "UserContextMiddleware"
   ]
 }
