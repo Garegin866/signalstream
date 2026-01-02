@@ -1,8 +1,10 @@
 #pragma once
+
+#include "dto/AuthDTO.h"
+#include "core/Error.h"
+
 #include <functional>
 #include <optional>
-#include "../dto/AuthDTO.h"
-#include "../core/Error.h"
 
 class AuthService {
 public:

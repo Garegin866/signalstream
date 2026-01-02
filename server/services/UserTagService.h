@@ -1,5 +1,7 @@
 #pragma once
-#include "../core/Error.h"
+
+#include "core/Error.h"
+
 #include <functional>
 
 struct TagDTO;

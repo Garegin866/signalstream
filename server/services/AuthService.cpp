@@ -1,8 +1,10 @@
 #include "AuthService.h"
-#include "../core/PasswordHasher.h"
-#include "../core/TokenGenerator.h"
-#include "../repositories/UserRepository.h"
-#include "../repositories/SessionRepository.h"
+
+#include "core/PasswordHasher.h"
+#include "core/TokenGenerator.h"
+#include "repositories/UserRepository.h"
+#include "repositories/SessionRepository.h"
+
 #include <drogon/HttpAppFramework.h>
 
 void AuthService::registerUser(
