@@ -1,6 +1,8 @@
 #include "UserTagService.h"
-#include "../repositories/TagsRepository.h"
-#include "../repositories/UserTagsRepository.h"
+
+#include "repositories/TagsRepository.h"
+#include "repositories/UserTagsRepository.h"
+
 #include <drogon/drogon.h>
 
 void UserTagService::attachTag(

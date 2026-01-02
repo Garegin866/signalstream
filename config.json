@@ -22,6 +22,9 @@
   "custom_config": {
     "logging": {
       "request": { "enabled": true }
+    },
+    "profiling": {
+      "enabled": true
     }
   },
 
