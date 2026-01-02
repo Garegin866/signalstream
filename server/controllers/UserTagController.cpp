@@ -28,9 +28,9 @@ void UserTagController::attach(
     UserTagService::attachTag(
             user.id,
             tagId,
-            [callback](const AppError &err) {
+            [callback, req](const AppError &err) {
                 if (err.hasError()) {
-                    callback(makeErrorResponse(err));
+                    callback(makeErrorResponse(err, req));
                     return;
                 }
 
@@ -50,9 +50,9 @@ void UserTagController::list(
 
     UserTagService::listUserTags(
             user.id,
-            [callback](const std::vector<TagDTO>& tags, const AppError& err) {
+            [callback, req](const std::vector<TagDTO>& tags, const AppError& err) {
                 if (err.hasError()) {
-                    callback(jsonError(500, "Internal error"));
+                    callback(makeErrorResponse(err, req));
                     return;
                 }
 

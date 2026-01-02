@@ -16,9 +16,9 @@ void NotificationsController::listNotifications(
 
     NotificationService::listNotifications(
             user.id,
-            [callback](const std::vector<NotificationDTO> &list, const AppError &err) {
+            [callback, req](const std::vector<NotificationDTO> &list, const AppError &err) {
                 if (err.hasError()) {
-                    callback(makeErrorResponse(err));
+                    callback(makeErrorResponse(err, req));
                     return;
                 }
 
@@ -44,7 +44,7 @@ void NotificationsController::markRead(
 
     auto json = req->getJsonObject();
     if (!json || !(*json).isMember(Const::JSON_ID)) {
-        callback(makeErrorResponse(AppError::Validation("Missing notification id")));
+        callback(makeErrorResponse(AppError::Validation("Missing notification id"), req));
         return;
     }
 
@@ -53,9 +53,9 @@ void NotificationsController::markRead(
     NotificationService::markAsRead(
             notificationId,
             user.id,
-            [callback](const AppError &err) {
+            [callback, req](const AppError &err) {
                 if (err.hasError()) {
-                    callback(makeErrorResponse(err));
+                    callback(makeErrorResponse(err, req));
                     return;
                 }
 

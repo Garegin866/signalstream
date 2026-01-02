@@ -17,7 +17,7 @@ void FeedController::getFeed(
     AppError err;
     Pagination pagination = PaginationParser::parse(req, err);
     if (err.hasError()) {
-        callback(makeErrorResponse(err));
+        callback(makeErrorResponse(err, req));
         return;
     }
 

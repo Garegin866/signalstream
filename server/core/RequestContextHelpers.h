@@ -10,11 +10,11 @@
 #define REQUIRE_USER(req, fcb)                                                            \
         auto attributes = req->attributes();                                              \
         if (!attributes->find(Const::ATTR_USER_ID)) {                                     \
-            fcb(makeErrorResponse(AppError::Unauthorized("Missing userId")));             \
+            fcb(makeErrorResponse(AppError::Unauthorized("Missing userId"), req));        \
             return;                                                                       \
         }                                                                                 \
         if (!attributes->find(Const::ATTR_USER)) {                                        \
-            fcb(makeErrorResponse(AppError::Unauthorized("Missing user object")));        \
+            fcb(makeErrorResponse(AppError::Unauthorized("Missing user object"), req));   \
             return;                                                                       \
         }
 
@@ -31,16 +31,16 @@
     do {                                                                                  \
         REQUIRE_AUTH_USER(req, fcb, user)                                                 \
         if (user.role != UserRole::Admin) {                                               \
-            fcb(makeErrorResponse(AppError::Forbidden("Admin access required")));         \
+            fcb(makeErrorResponse(AppError::Forbidden("Admin access required"), req));    \
             return;                                                                       \
         }                                                                                 \
     } while (0)
 
-#define REQUIRE_MOD_OR_ADMIN(req, fcb)                                              \
+#define REQUIRE_MOD_OR_ADMIN(req, fcb)                                                    \
     do {                                                                                  \
         REQUIRE_AUTH_USER(req, fcb, user)                                                 \
         if (user.role != UserRole::Admin && user.role != UserRole::Moderator) {           \
-            fcb(makeErrorResponse(AppError::Forbidden("Moderator or Admin access required"))); \
+            fcb(makeErrorResponse(AppError::Forbidden("Moderator or Admin access required"), req)); \
             return;                                                                       \
         }                                                                                 \
     } while (0)

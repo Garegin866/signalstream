@@ -46,8 +46,13 @@ set(MIDDLEWARE
         middleware/RequestLoggingMiddleware.cpp
 )
 
+set(CORE
+        core/ErrorLogger.cpp
+)
+
 add_executable(${PROJECT_NAME}
         main.cpp
+        ${CORE}
         ${REPOSITORIES}
         ${SERVICES}
         ${CONTROLLERS}

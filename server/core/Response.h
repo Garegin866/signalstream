@@ -3,22 +3,30 @@
 #include <drogon/HttpResponse.h>
 
 #include "Constants.h"
+#include "ErrorLogger.h"
 
 using namespace drogon;
 
-inline HttpResponsePtr jsonOK(const Json::Value &body) {
+inline HttpResponsePtr jsonOK(
+        const Json::Value &body
+) {
     auto resp = HttpResponse::newHttpJsonResponse(body);
     resp->setStatusCode(k200OK);
     return resp;
 }
 
-inline HttpResponsePtr jsonCreated(const Json::Value &body) {
+inline HttpResponsePtr jsonCreated(
+        const Json::Value &body
+) {
     auto resp = HttpResponse::newHttpJsonResponse(body);
     resp->setStatusCode(k201Created);
     return resp;
 }
 
-inline HttpResponsePtr jsonError(int code, const std::string &msg) {
+inline HttpResponsePtr jsonError(
+        int code,
+        const std::string &msg
+) {
     Json::Value body(Json::objectValue);
     body[Const::JSON_ERROR] = msg;
 
@@ -27,7 +35,12 @@ inline HttpResponsePtr jsonError(int code, const std::string &msg) {
     return resp;
 }
 
-inline drogon::HttpResponsePtr makeErrorResponse(const AppError& err) {
+inline drogon::HttpResponsePtr makeErrorResponse(
+        const AppError& err,
+        const drogon::HttpRequestPtr& req
+) {
+    ErrorLogger::logAppError(err, req);
+
     Json::Value json;
     json[Const::JSON_ERROR] = err.message;
 
