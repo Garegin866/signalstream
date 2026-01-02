@@ -1,6 +1,7 @@
 #pragma once
 
 #include "dto/AuthDTO.h"
+#include "dto/HealthDTO.h"
 #include "core/Error.h"
 
 #include <vector>
@@ -18,5 +19,9 @@ public:
 
     static void listModerators(
             std::function<void(const std::vector<UserDTO>&, const AppError&)> cb
+    );
+
+    static void health(
+            const std::function<void(const HealthDTO&)>& cb
     );
 };

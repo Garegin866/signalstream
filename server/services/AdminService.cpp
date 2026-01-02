@@ -3,6 +3,9 @@
 #include "repositories/UserRepository.h"
 #include "services/RoleService.h"
 
+#include "core/Version.h"
+#include "core/Uptime.h"
+
 #include <drogon/drogon.h>
 
 void AdminService::listUsers(
@@ -35,4 +38,32 @@ void AdminService::listModerators(
     auto client = drogon::app().getDbClient();
 
     UserRepository::listModerators(client, cb);
+}
+
+void AdminService::health(
+        const std::function<void(const HealthDTO&)>& cb
+) {
+    auto client = drogon::app().getDbClient();
+
+    client->execSqlAsync(
+            "SELECT 1;",
+            [cb](const drogon::orm::Result&) {
+                HealthDTO dto;
+                dto.status = "ok";
+                dto.db = "ok";
+                dto.uptimeSec = Uptime::seconds();
+                dto.timestamp = trantor::Date::now().toFormattedString(true);
+                dto.version = APP_VERSION;
+                cb(dto);
+            },
+            [cb](const std::exception_ptr&) {
+                HealthDTO dto;
+                dto.status = "degraded";
+                dto.db = "down";
+                dto.uptimeSec = Uptime::seconds();
+                dto.timestamp = trantor::Date::now().toFormattedString(true);
+                dto.version = APP_VERSION;
+                cb(dto);
+            }
+    );
 }
