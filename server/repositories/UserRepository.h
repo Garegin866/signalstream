@@ -40,4 +40,11 @@ public:
             const drogon::orm::DbClientPtr& client,
             const std::function<void(const std::vector<UserDTO>&, const AppError&)>& cb
     );
+
+    static void updatePassword(
+            const drogon::orm::DbClientPtr& client,
+            int userId,
+            const std::string& passwordHash,
+            const std::function<void(const AppError&)>& cb
+    );
 };

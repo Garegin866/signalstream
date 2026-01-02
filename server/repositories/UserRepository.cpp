@@ -161,3 +161,22 @@ void UserRepository::listModerators(
             }
     );
 }
+
+void UserRepository::updatePassword(
+        const drogon::orm::DbClientPtr& client,
+        int userId,
+        const std::string& passwordHash,
+        const std::function<void(const AppError&)>& cb
+) {
+    client->execSqlAsync(
+            "UPDATE users SET password_hash=$2 WHERE id=$1;",
+            [cb](const drogon::orm::Result&) {
+                cb(AppError{});
+            },
+            [cb](const std::exception_ptr&) {
+                cb(AppError::Database("Failed to update password"));
+            },
+            userId,
+            passwordHash
+    );
+}

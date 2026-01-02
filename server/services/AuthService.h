@@ -24,4 +24,15 @@ public:
             const std::string &token,
             const std::function<void(const AppError&)>& cb
     );
+
+    static void requestPasswordReset(
+            const std::string& email,
+            std::function<void(const AppError&)>&& cb
+    );
+
+    static void resetPassword(
+            const std::string& token,
+            const std::string& newPassword,
+            std::function<void(const AppError&)>&& cb
+    );
 };

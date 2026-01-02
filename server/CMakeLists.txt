@@ -17,6 +17,7 @@ set(REPOSITORIES
         repositories/ItemTagsRepository.cpp
         repositories/FeedRepository.cpp
         repositories/NotificationRepository.cpp
+        repositories/ResetTokenRepository.cpp
 )
 
 set(SERVICES
@@ -28,6 +29,7 @@ set(SERVICES
         services/AdminService.cpp
         services/RoleService.cpp
         services/NotificationService.cpp
+        services/EmailService.cpp
 )
 
 set(CONTROLLERS
@@ -51,9 +53,14 @@ set(CORE
         core/ErrorLogger.cpp
 )
 
+set(UTILS
+        utils/SmtpClient.cpp
+)
+
 add_executable(${PROJECT_NAME}
         main.cpp
         ${CORE}
+        ${UTILS}
         ${REPOSITORIES}
         ${SERVICES}
         ${CONTROLLERS}

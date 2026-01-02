@@ -6,6 +6,15 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE reset_tokens (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token TEXT NOT NULL UNIQUE,
+    expires_at TIMESTAMP NOT NULL,
+    used_at TIMESTAMP NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS sessions (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -51,6 +60,13 @@ CREATE TABLE IF NOT EXISTS notifications (
 
     UNIQUE (user_id, entity_type, entity_id)
 );
+
+
+CREATE INDEX idx_reset_tokens_token
+    ON reset_tokens(token);
+
+CREATE INDEX idx_reset_tokens_user_id
+    ON reset_tokens(user_id);
 
 CREATE INDEX idx_user_tags_user_id_tag_id
     ON user_tags(user_id, tag_id);

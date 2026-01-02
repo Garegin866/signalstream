@@ -23,4 +23,10 @@ public:
             const std::string& token,
             const std::function<void(bool, const AppError&)>& cb
     );
+
+    static void deleteByUserId(
+            const drogon::orm::DbClientPtr& client,
+            int userId,
+            const std::function<void(const AppError&)>& cb
+    );
 };

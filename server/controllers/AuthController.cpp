@@ -102,3 +102,55 @@ void AuthController::logout(
             }
     );
 }
+
+void AuthController::resetRequest(
+        const HttpRequestPtr &req,
+        std::function<void(const HttpResponsePtr&)> &&callback
+) {
+    auto json = req->getJsonObject();
+    if (!json || !json->isMember(Const::JSON_EMAIL)) {
+        Json::Value res;
+        res[Const::JSON_OK] = true;
+        callback(jsonOK(res));
+        return;
+    }
+
+    AuthService::requestPasswordReset(
+            (*json)[Const::JSON_EMAIL].asString(),
+            [callback](const AppError&) {
+                Json::Value res;
+                res[Const::JSON_OK] = true;
+
+                callback(jsonOK(res));
+            }
+    );
+}
+
+void AuthController::resetConfirm(
+        const HttpRequestPtr &req,
+        std::function<void(const HttpResponsePtr&)> &&callback
+) {
+    auto json = req->getJsonObject();
+    if (!json || !json->isMember(Const::JSON_TOKEN) || !json->isMember(Const::JSON_PASSWORD)) {
+        callback(makeErrorResponse(
+                AppError::Validation("Token and password are required"),
+                req
+        ));
+        return;
+    }
+
+    AuthService::resetPassword(
+            (*json)[Const::JSON_TOKEN].asString(),
+            (*json)[Const::JSON_PASSWORD].asString(),
+            [callback, req](const AppError& err) {
+                if (err.hasError()) {
+                    callback(makeErrorResponse(err, req));
+                    return;
+                }
+
+                Json::Value res;
+                res[Const::JSON_OK] = true;
+                callback(jsonOK(res));
+            }
+    );
+}
