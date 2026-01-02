@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Drogon REQUIRED)
+find_package(CURL REQUIRED)
 find_package(argon2 REQUIRED CONFIG)
 
 set(REPOSITORIES
@@ -69,4 +70,5 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 #
 target_link_libraries(${PROJECT_NAME} PRIVATE Drogon::Drogon)
+target_link_libraries(${PROJECT_NAME} PRIVATE CURL::libcurl)
 target_link_libraries(${PROJECT_NAME} PRIVATE argon2::argon2)

@@ -24,6 +24,9 @@ enum class ErrorType {
     // 500
     Database,
     Internal,
+
+    // 503 - Service Unavailable
+    External
 };
 
 struct AppError {
@@ -67,6 +70,10 @@ struct AppError {
     static AppError Internal(std::string msg) {
         return AppError{ErrorType::Internal, std::move(msg)};
     }
+
+    static AppError External(std::string msg) {
+        return AppError{ErrorType::External, std::move(msg)};
+    }
 };
 
 inline drogon::HttpStatusCode toHttpStatus(const AppError& err) {
@@ -85,6 +92,8 @@ inline drogon::HttpStatusCode toHttpStatus(const AppError& err) {
             return drogon::k500InternalServerError;
         case ErrorType::Internal:
             return drogon::k500InternalServerError;
+        case ErrorType::External:
+            return drogon::k503ServiceUnavailable;
         case ErrorType::None:
         default:
             return drogon::k200OK;

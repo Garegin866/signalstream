@@ -1,8 +1,9 @@
 [requires]
 drogon/1.9.10
+libcurl/8.17.0
 argon2/20190702
 
-[options]
+[options]con
 drogon/*:with_orm=True
 drogon/*:with_postgres=True
 
