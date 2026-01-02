@@ -42,9 +42,9 @@ void ItemsController::createItem(
             description,
             url,
             tagIds,
-            [cb](const ItemDTO& item, const AppError& err) {
+            [cb, req](const ItemDTO& item, const AppError& err) {
                 if (err.hasError()) {
-                    cb(makeErrorResponse(err));
+                    cb(makeErrorResponse(err, req));
                     return;
                 }
 
@@ -56,15 +56,15 @@ void ItemsController::createItem(
 
 
 void ItemsController::getItem(
-        const drogon::HttpRequestPtr&,
+        const drogon::HttpRequestPtr& req,
         std::function<void(const drogon::HttpResponsePtr&)>&& cb,
         int itemId
 ) {
     ItemsService::getItem(
             itemId,
-            [cb](const std::optional<ItemDTO>& item, const AppError& err) {
+            [cb, req](const std::optional<ItemDTO>& item, const AppError& err) {
                 if (err.hasError()) {
-                    cb(makeErrorResponse(err));
+                    cb(makeErrorResponse(err, req));
                     return;
                 }
 
@@ -87,15 +87,15 @@ void ItemsController::listItems(
     AppError err;
     Pagination pagination = PaginationParser::parse(req, err);
     if (err.hasError()) {
-        cb(makeErrorResponse(err));
+        cb(makeErrorResponse(err, req));
         return;
     }
 
     ItemsService::listItems(
             pagination,
-            [cb, pagination](const std::vector<ItemDTO>& items, const AppError& err) {
+            [cb, pagination, req](const std::vector<ItemDTO>& items, const AppError& err) {
                 if (err.hasError()) {
-                    cb(makeErrorResponse(err));
+                    cb(makeErrorResponse(err, req));
                     return;
                 }
 
@@ -151,15 +151,15 @@ void ItemsController::updateItem(
                 ErrorType::Validation,
                 "At least one of title, description or url must be provided"
                 );
-        cb(makeErrorResponse(err));
+        cb(makeErrorResponse(err, req));
         return;
     }
 
     ItemsService::updateItem(
             itemId, title, description, url,
-            [cb](const std::optional<ItemDTO>& item, const AppError& err) {
+            [cb, req](const std::optional<ItemDTO>& item, const AppError& err) {
                 if (err.hasError()) {
-                    cb(makeErrorResponse(err));
+                    cb(makeErrorResponse(err, req));
                     return;
                 }
 
@@ -184,9 +184,9 @@ void ItemsController::deleteItem(
 
     ItemsService::deleteItem(
             itemId,
-            [cb](const AppError& err) {
+            [cb, req](const AppError& err) {
                 if (err.hasError()) {
-                    cb(makeErrorResponse(err));
+                    cb(makeErrorResponse(err, req));
                     return;
                 }
 

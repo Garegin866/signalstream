@@ -27,9 +27,9 @@ void AuthController::registerUser(
     AuthService::registerUser(
             email,
             password,
-            [callback](const UserDTO &user, const AppError &err) {
+            [callback, req](const UserDTO &user, const AppError &err) {
                 if (err.hasError()) {
-                    callback(makeErrorResponse(err));
+                    callback(makeErrorResponse(err, req));
                     return;
                 }
 
@@ -55,9 +55,9 @@ void AuthController::loginUser(
     AuthService::loginUser(
             email,
             password,
-            [callback](const SessionDTO &session, const AppError &err) {
+            [callback, req](const SessionDTO &session, const AppError &err) {
                 if (err.hasError()) {
-                    callback(makeErrorResponse(err));
+                    callback(makeErrorResponse(err, req));
                     return;
                 }
 
@@ -89,9 +89,9 @@ void AuthController::logout(
 
     AuthService::logout(
             token,
-            [callback](const AppError& err) {
+            [callback, req](const AppError& err) {
                 if (err.hasError()) {
-                    callback(makeErrorResponse(err));
+                    callback(makeErrorResponse(err, req));
                     return;
                 }
 

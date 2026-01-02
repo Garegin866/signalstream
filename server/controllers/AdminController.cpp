@@ -14,9 +14,9 @@ void AdminController::listUsers(
     REQUIRE_ADMIN(req, cb);
 
     AdminService::listUsers(
-            [cb](const std::vector<UserDTO>& users, const AppError& err) {
+            [cb, req](const std::vector<UserDTO>& users, const AppError& err) {
                 if (err.hasError()) {
-                    cb(makeErrorResponse(err));
+                    cb(makeErrorResponse(err, req));
                     return;
                 }
 
@@ -57,9 +57,9 @@ void AdminController::setRole(
             actingUser.id,
             targetUserId,
             role,
-            [cb](const UserDTO& user, const AppError& err) {
+            [cb, req](const UserDTO& user, const AppError& err) {
                 if (err.hasError()) {
-                    cb(makeErrorResponse(err));
+                    cb(makeErrorResponse(err, req));
                     return;
                 }
 
@@ -71,14 +71,14 @@ void AdminController::setRole(
 
 void AdminController::listModerators(
         const drogon::HttpRequestPtr& req,
-        std::function<void(const drogon::HttpResponsePtr&)>&& callback
+        std::function<void(const drogon::HttpResponsePtr&)>&& cb
 ) {
-    REQUIRE_ADMIN(req, callback);
+    REQUIRE_ADMIN(req, cb);
 
     AdminService::listModerators(
-            [callback](const std::vector<UserDTO>& users, const AppError& err) {
+            [cb, req](const std::vector<UserDTO>& users, const AppError& err) {
                 if (err.hasError()) {
-                    callback(makeErrorResponse(err));
+                    cb(makeErrorResponse(err, req));
                     return;
                 }
 
@@ -92,7 +92,7 @@ void AdminController::listModerators(
                 Json::Value body;
                 body[Const::JSON_MODERS] = arr;
 
-                callback(jsonOK(body));
+                cb(jsonOK(body));
             }
     );
 }
@@ -101,6 +101,8 @@ void AdminController::health(
         const HttpRequestPtr& req,
         std::function<void(const HttpResponsePtr&)>&& cb
 ) {
+    (void)req;
+
     AdminService::health(
             [cb](const HealthDTO& dto) {
                 Json::Value body;

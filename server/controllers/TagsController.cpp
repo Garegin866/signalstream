@@ -11,9 +11,9 @@ void TagsController::listTags(
         std::function<void(const HttpResponsePtr &)> &&callback
 ) {
     TagsService::listTags(
-            [callback](const std::vector<TagDTO> &tags, const AppError &err) {
+            [callback, req](const std::vector<TagDTO> &tags, const AppError &err) {
                 if (err.hasError()) {
-                    callback(makeErrorResponse(err));
+                    callback(makeErrorResponse(err, req));
                     return;
                 }
 
@@ -50,9 +50,9 @@ void TagsController::createTag(
 
     TagsService::createTag(
             name,
-            [callback](const TagDTO &dto, const AppError &err) {
+            [callback, req](const TagDTO &dto, const AppError &err) {
                 if (err.hasError()) {
-                    callback(makeErrorResponse(err));
+                    callback(makeErrorResponse(err, req));
                     return;
                 }
 

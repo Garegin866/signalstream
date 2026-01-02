@@ -13,7 +13,7 @@ void UserContextMiddleware::doFilter(
     // Expect userId from TokenMiddleware
     auto attributes = req->attributes();
     if (!attributes->find(Const::ATTR_USER_ID)) {
-        fcb(makeErrorResponse(AppError::Unauthorized("Missing userId attribute")));
+        fcb(makeErrorResponse(AppError::Unauthorized("Missing userId attribute"), req));
         return;
     }
 
@@ -28,12 +28,12 @@ void UserContextMiddleware::doFilter(
                     const AppError& err
             ) mutable {
                 if (err.hasError()) {
-                    fcb(makeErrorResponse(err));
+                    fcb(makeErrorResponse(err, req));
                     return;
                 }
 
                 if (!user) {
-                    fcb(makeErrorResponse(AppError::Unauthorized("User not found")));
+                    fcb(makeErrorResponse(AppError::Unauthorized("User not found"), req));
                     return;
                 }
 
