@@ -5,6 +5,7 @@
 #include "mappers/UserMapper.h"
 #include "mappers/MapperRegistry.h"
 #include "services/AdminService.h"
+#include "dto/HealthDTO.h"
 
 void AdminController::listUsers(
         const HttpRequestPtr& req,
@@ -92,6 +93,24 @@ void AdminController::listModerators(
                 body[Const::JSON_MODERS] = arr;
 
                 callback(jsonOK(body));
+            }
+    );
+}
+
+void AdminController::health(
+        const HttpRequestPtr& req,
+        std::function<void(const HttpResponsePtr&)>&& cb
+) {
+    AdminService::health(
+            [cb](const HealthDTO& dto) {
+                Json::Value body;
+                body["status"] = dto.status;
+                body["db"] = dto.db;
+                body["uptime_sec"] = dto.uptimeSec;
+                body["timestamp"] = dto.timestamp;
+                body["version"] = dto.version;
+
+                cb(jsonOK(body));
             }
     );
 }
