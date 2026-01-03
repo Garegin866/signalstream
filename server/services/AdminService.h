@@ -10,18 +10,24 @@
 class AdminService {
 public:
     static void listUsers(
-            std::function<void(const std::vector<UserDTO>&, const AppError&)> cb
+            const std::function<void(const std::vector<UserDTO>&, const AppError&)>& cb
     );
 
     static void setRole(int actorId, int targetUserId, UserRole newRole,
-            std::function<void(const UserDTO&, const AppError&)> cb
+            const std::function<void(const UserDTO&, const AppError&)>& cb
     );
 
     static void listModerators(
-            std::function<void(const std::vector<UserDTO>&, const AppError&)> cb
+            const std::function<void(const std::vector<UserDTO>&, const AppError&)>& cb
     );
 
     static void health(
             const std::function<void(const HealthDTO&)>& cb
+    );
+
+    static void broadcastEmail(
+            const std::string& subject,
+            const std::string& message,
+            const std::function<void(const AppError&)>& cb
     );
 };

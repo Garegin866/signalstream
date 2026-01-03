@@ -9,6 +9,7 @@ public:
         ADD_METHOD_TO(AdminController::listUsers, "/admin/users", drogon::Get, AUTH_CHAIN);
         ADD_METHOD_TO(AdminController::setRole, "/admin/set-role", drogon::Post, AUTH_CHAIN);
         ADD_METHOD_TO(AdminController::listModerators, "/admin/moderators", drogon::Get, AUTH_CHAIN);
+        ADD_METHOD_TO(AdminController::broadcastEmail, "/admin/email/broadcast", drogon::Post, AUTH_CHAIN);
         ADD_METHOD_TO(AdminController::health, "/admin/health", drogon::Get, PUBLIC);
     METHOD_LIST_END
 
@@ -28,6 +29,11 @@ public:
     );
 
     static void health(
+            const drogon::HttpRequestPtr& req,
+            std::function<void(const drogon::HttpResponsePtr&)>&& cb
+    );
+
+    static void broadcastEmail(
             const drogon::HttpRequestPtr& req,
             std::function<void(const drogon::HttpResponsePtr&)>&& cb
     );

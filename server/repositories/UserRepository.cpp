@@ -114,6 +114,28 @@ void UserRepository::listAllUsers(
     );
 }
 
+void UserRepository::listActiveEmails(
+        const drogon::orm::DbClientPtr& client,
+        const std::function<void(const std::vector<std::string>&, const AppError&)>& cb
+) {
+    client->execSqlAsync(
+            "SELECT email FROM users WHERE email IS NOT NULL;",
+            [cb](const drogon::orm::Result& r) {
+                std::vector<std::string> emails;
+                emails.reserve(r.size());
+
+                for (const auto& row : r) {
+                    emails.push_back(row["email"].as<std::string>());
+                }
+
+                cb(emails, AppError{});
+            },
+            [cb](const std::exception_ptr&) {
+                cb({}, AppError::Database("Failed to list user emails"));
+            }
+    );
+}
+
 void UserRepository::updateRole(
         const drogon::orm::DbClientPtr& client,
         int userId,
