@@ -1,0 +1,57 @@
+name: CI Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  tests:
+    name: Build & Run Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            python3-pip \
+            libssl-dev \
+            libpq-dev
+
+      - name: Install Conan
+        run: |
+          pip3 install --upgrade pip
+          pip3 install conan
+
+      - name: Detect Conan profile
+        run: |
+          conan profile detect --force
+
+      - name: Install dependencies (Conan)
+        run: |
+          conan install . \
+            --output-folder=build \
+            --build=missing \
+            -s build_type=Release
+
+      - name: Configure CMake
+        run: |
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake
+
+      - name: Build tests
+        run: |
+          cmake --build build --target test_signalstream -j
+
+      - name: Run tests
+        working-directory: build
+        run: |
+          ctest --output-on-failure
