@@ -2,6 +2,8 @@
 
 #include <curl/curl.h>
 #include <sstream>
+#include <algorithm>
+#include <cstring>
 
 namespace utils {
 
