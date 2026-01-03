@@ -116,3 +116,36 @@ void AdminController::health(
             }
     );
 }
+
+void AdminController::broadcastEmail(
+        const HttpRequestPtr& req,
+        std::function<void(const HttpResponsePtr&)>&& cb
+) {
+    REQUIRE_ADMIN(req, cb);
+
+    auto json = req->getJsonObject();
+    if (!json ||
+        !json->isMember("subject") ||
+        !json->isMember("message")) {
+        cb(jsonError(400, "subject and message required"));
+        return;
+    }
+
+    std::string subject = (*json)["subject"].asString();
+    std::string message = (*json)["message"].asString();
+
+    AdminService::broadcastEmail(
+            subject,
+            message,
+            [cb, req](const AppError& err) {
+                if (err.hasError()) {
+                    cb(makeErrorResponse(err, req));
+                    return;
+                }
+
+                Json::Value ok;
+                ok[Const::JSON_OK] = true;
+                cb(jsonOK(ok));
+            }
+    );
+}

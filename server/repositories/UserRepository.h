@@ -29,6 +29,11 @@ public:
             const std::function<void(const std::vector<UserDTO>&, const AppError&)>& cb
     );
 
+    static void listActiveEmails(
+            const drogon::orm::DbClientPtr& client,
+            const std::function<void(const std::vector<std::string>&, const AppError&)>& cb
+    );
+
     static void updateRole(
             const drogon::orm::DbClientPtr& client,
             int userId,
