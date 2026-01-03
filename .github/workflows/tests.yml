@@ -1,4 +1,4 @@
-name: CI Tests
+name: Unit Tests
 
 on:
   pull_request:
@@ -8,50 +8,78 @@ on:
 
 jobs:
   tests:
-    name: Build & Run Unit Tests
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            build-essential \
-            cmake \
-            python3-pip \
-            libssl-dev \
-            libpq-dev
+      # ---------------------------
+      # Conan cache
+      # ---------------------------
+      - name: Cache Conan packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.conan2/p
+          key: conan-${{ runner.os }}-${{ hashFiles('conanfile.txt') }}
+          restore-keys: |
+            conan-${{ runner.os }}-
 
-      - name: Install Conan
+      # ---------------------------
+      # Conan
+      # ---------------------------
+      - name: Install Conan 2
         run: |
-          pip3 install --upgrade pip
-          pip3 install conan
+          pip install conan==2.22.2
+          conan --version
 
       - name: Detect Conan profile
-        run: |
-          conan profile detect --force
+        run: conan profile detect --force
 
-      - name: Install dependencies (Conan)
+      # ---------------------------
+      # Install dependencies
+      # ---------------------------
+      - name: Conan install (Release)
         run: |
           conan install . \
-            --output-folder=build \
             --build=missing \
-            -s build_type=Release
+            -s compiler.cppstd=20
 
-      - name: Configure CMake
+      # ---------------------------
+      # Build tools
+      # ---------------------------
+      - name: Install Ninja
+        run: sudo apt-get install -y ninja-build
+
+      # ---------------------------
+      # Sanity check
+      # ---------------------------
+      - name: Verify toolchain
+        run: |
+          test -f build/Release/generators/conan_toolchain.cmake
+          echo "Conan toolchain found"
+
+      # ---------------------------
+      # Configure
+      # ---------------------------
+      - name: Configure CMake (tests)
         run: |
           cmake -S . -B build \
+            -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake
+            -DCMAKE_TOOLCHAIN_FILE=build/Release/generators/conan_toolchain.cmake \
+            -DBUILD_TESTS=ON
 
-      - name: Build tests
-        run: |
-          cmake --build build --target test_signalstream -j
+      # ---------------------------
+      # Build
+      # ---------------------------
+      - name: Build
+        run: cmake --build build -j
 
+      # ---------------------------
+      # Run tests
+      # ---------------------------
       - name: Run tests
-        working-directory: build
         run: |
+          cd build
           ctest --output-on-failure
