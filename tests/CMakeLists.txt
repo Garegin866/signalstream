@@ -1,11 +1,27 @@
-find_package(Catch2 REQUIRED)
+find_package(JsonCpp REQUIRED)
+find_package(Catch2 3 REQUIRED)
+find_package(argon2 REQUIRED)
+find_package(Drogon REQUIRED)
 
 add_executable(test_signalstream
-        main.cpp
-        unit/dummy_test.cpp
+        unit/test_token_generator.cpp
+        unit/test_password_hasher.cpp
+        unit/test_error.cpp
+        unit/test_response_helpers.cpp
 )
 
-target_link_libraries(test_signalstream PRIVATE Catch2::Catch2WithMain)
-target_compile_features(test_signalstream PRIVATE cxx_std_20)
+target_include_directories(test_signalstream PRIVATE
+        ${CMAKE_SOURCE_DIR}/server
+)
 
-add_test(NAME test_signalstream COMMAND test_signalstream)
+target_link_libraries(test_signalstream PRIVATE
+        JsonCpp::JsonCpp
+        Catch2::Catch2WithMain
+        argon2::argon2
+        Drogon::Drogon
+)
+
+add_test(
+        NAME signalstream_tests
+        COMMAND test_signalstream
+)

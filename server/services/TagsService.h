@@ -1,7 +1,7 @@
 #pragma once
 
 #include "dto/TagDTO.h"
-#include "core/Error.h"
+#include "core/AppError.h"
 
 #include <functional>
 

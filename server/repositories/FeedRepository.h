@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/Error.h"
+#include "core/AppError.h"
 #include "pagination/Pagination.h"
 #include "dto/FeedItemDTO.h"
 

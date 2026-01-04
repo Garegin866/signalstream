@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <random>
 #include <drogon/utils/Utilities.h>
 
 class TokenGenerator {

@@ -1,7 +1,9 @@
 #pragma once
+
 #include <drogon/orm/DbClient.h>
-#include "../dto/AuthDTO.h"
-#include "../core/Error.h"
+
+#include "dto/AuthDTO.h"
+#include "core/AppError.h"
 
 class SessionRepository {
 public:
