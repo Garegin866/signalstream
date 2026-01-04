@@ -3,7 +3,7 @@
 #include "dto/NotificationDTO.h"
 #include "repositories/NotificationRepository.h"
 #include "repositories/UserRepository.h"
-#include "core/Error.h"
+#include "core/AppError.h"
 
 #include <drogon/drogon.h>
 

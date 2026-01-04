@@ -1,12 +1,13 @@
 #pragma once
+
 #include <vector>
 #include <functional>
 #include <optional>
 #include <drogon/orm/DbClient.h>
 
-#include "../dto/TagDTO.h"
-#include "../dto/ItemDTO.h"
-#include "../core/Error.h"
+#include "dto/TagDTO.h"
+#include "dto/ItemDTO.h"
+#include "core/AppError.h"
 
 class ItemTagsRepository {
 public:

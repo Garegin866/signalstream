@@ -1,7 +1,7 @@
 #pragma once
 
 #include "dto/AuthDTO.h"
-#include "core/Error.h"
+#include "core/AppError.h"
 
 #include <functional>
 #include <optional>

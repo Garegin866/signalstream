@@ -1,7 +1,7 @@
 #pragma once
 
 #include "dto/ItemDTO.h"
-#include "core/Error.h"
+#include "core/AppError.h"
 #include "pagination/Pagination.h"
 
 #include <optional>

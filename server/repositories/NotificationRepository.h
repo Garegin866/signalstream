@@ -1,7 +1,7 @@
 #pragma once
 
 #include "dto/NotificationDTO.h"
-#include "core/Error.h"
+#include "core/AppError.h"
 
 #include <drogon/drogon.h>
 

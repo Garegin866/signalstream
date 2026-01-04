@@ -2,7 +2,7 @@
 
 #include "dto/AuthDTO.h"
 #include "dto/HealthDTO.h"
-#include "core/Error.h"
+#include "core/AppError.h"
 
 #include <vector>
 #include <functional>
