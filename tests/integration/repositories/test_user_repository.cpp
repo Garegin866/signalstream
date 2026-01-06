@@ -4,39 +4,11 @@
 
 #include "repositories/UserRepository.h"
 #include "dto/AuthDTO.h"
+
 #include "tests/integration/db_bootstrap.h"
+#include "tests/integration/db_builders.h"
 
 using drogon::orm::DbClientPtr;
-
-namespace {
-
-    UserDTO createTestUser(
-            const DbClientPtr& client,
-            const std::string& email = "test@example.com"
-    ) {
-        std::promise<UserDTO> userPromise;
-        std::promise<AppError> errorPromise;
-
-        UserRepository::createUser(
-                client,
-                email,
-                "hash",
-                [&](const UserDTO& u, const AppError& e) {
-                    userPromise.set_value(u);
-                    errorPromise.set_value(e);
-                }
-        );
-
-        auto result =  userPromise.get_future().get();
-        auto error  = errorPromise.get_future().get();
-
-        REQUIRE_FALSE(error.hasError());
-        REQUIRE(result.id >= 0);
-
-        return result;
-    }
-
-} // namespace
 
 TEST_CASE("UserRepository::createUser inserts a user") {
     auto client = db::bootstrap::makeClient();
@@ -67,7 +39,7 @@ TEST_CASE("UserRepository::findByEmail finds existing user") {
     auto client = db::bootstrap::makeClient();
     db::bootstrap::resetDb(client);
 
-    auto created = createTestUser(client, "find@test.com");
+    auto created = db::builder::createUser(client, "find@test.com");
 
     std::promise<std::optional<UserDTO>> resultPromise;
     std::promise<AppError> errorPromise;

@@ -3,71 +3,23 @@
 #include <drogon/orm/DbClient.h>
 
 #include "repositories/ItemTagsRepository.h"
-#include "repositories/ItemsRepository.h"
-#include "repositories/TagsRepository.h"
 
 #include "dto/ItemDTO.h"
 #include "dto/TagDTO.h"
 #include "core/AppError.h"
+
 #include "tests/integration/db_bootstrap.h"
+#include "tests/integration/db_builders.h"
 
 using drogon::orm::DbClientPtr;
-
-namespace {
-
-    ItemDTO createItem(const DbClientPtr& client, const std::string& title) {
-        std::promise<ItemDTO> p;
-        std::promise<AppError> e;
-
-        ItemsRepository::createItem(
-                client,
-                title,
-                "desc",
-                "url",
-                [&](const ItemDTO& item, const AppError& err) {
-                    p.set_value(item);
-                    e.set_value(err);
-                }
-        );
-
-        auto err = e.get_future().get();
-        REQUIRE_FALSE(err.hasError());
-
-        return p.get_future().get();
-    }
-
-    TagDTO createTag(const DbClientPtr& client, const std::string& name) {
-        std::promise<TagDTO> p;
-        std::promise<AppError> e;
-
-        TagsRepository::createTag(
-                client,
-                name,
-                [&](const TagDTO& tag, const AppError& err) {
-                    p.set_value(tag);
-                    e.set_value(err);
-                }
-        );
-
-        auto err = e.get_future().get();
-        REQUIRE_FALSE(err.hasError());
-
-        return p.get_future().get();
-    }
-
-} // namespace
-
-// ------------------------------------------------------------------
-// Tests
-// ------------------------------------------------------------------
 
 TEST_CASE("ItemTagsRepository::attachTagsToItem attaches tags") {
     auto client = db::bootstrap::makeClient();
     db::bootstrap::resetDb(client);
 
-    auto item = createItem(client, "item1");
-    auto tagA = createTag(client, "tagA");
-    auto tagB = createTag(client, "tagB");
+    auto item = db::builder::createItem(client, "item1");
+    auto tagA = db::builder::createTag(client, "tagA");
+    auto tagB = db::builder::createTag(client, "tagB");
 
     std::promise<bool> ok;
     std::promise<AppError> err;
@@ -90,9 +42,9 @@ TEST_CASE("ItemTagsRepository::listTagsForItem returns attached tags") {
     auto client = db::bootstrap::makeClient();
     db::bootstrap::resetDb(client);
 
-    auto item = createItem(client, "item1");
-    auto tagA = createTag(client, "alpha");
-    auto tagB = createTag(client, "beta");
+    auto item = db::builder::createItem(client, "item1");
+    auto tagA = db::builder::createTag(client, "alpha");
+    auto tagB = db::builder::createTag(client, "beta");
 
     ItemTagsRepository::attachTagsToItem(client, item.id, {tagA.id, tagB.id},
                                          [](bool, const AppError&) {});
@@ -120,9 +72,9 @@ TEST_CASE("ItemTagsRepository::listItemsForTag returns tagged items") {
     auto client = db::bootstrap::makeClient();
     db::bootstrap::resetDb(client);
 
-    auto item1 = createItem(client, "item1");
-    auto item2 = createItem(client, "item2");
-    auto tag = createTag(client, "cpp");
+    auto item1 = db::builder::createItem(client, "item1");
+    auto item2 = db::builder::createItem(client, "item2");
+    auto tag = db::builder::createTag(client, "cpp");
 
     ItemTagsRepository::attachTagsToItem(client, item1.id, {tag.id},
                                          [](bool, const AppError&) {});
@@ -150,8 +102,8 @@ TEST_CASE("ItemTagsRepository prevents duplicate attachment") {
     auto client = db::bootstrap::makeClient();
     db::bootstrap::resetDb(client);
 
-    auto item = createItem(client, "item");
-    auto tag  = createTag(client, "dup");
+    auto item = db::builder::createItem(client, "item");
+    auto tag  = db::builder::createTag(client, "dup");
 
     ItemTagsRepository::attachTagsToItem(client, item.id, {tag.id},
                                          [](bool, const AppError&) {});

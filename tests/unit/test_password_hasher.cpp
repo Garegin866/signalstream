@@ -1,4 +1,5 @@
 #include <catch2/catch_all.hpp>
+
 #include "utils/PasswordHasher.h"
 
 TEST_CASE("PasswordHasher hash/verify") {

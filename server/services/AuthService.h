@@ -6,33 +6,40 @@
 #include <functional>
 #include <optional>
 
+#include <drogon/orm/DbClient.h>
+
 class AuthService {
 public:
-    static void registerUser(
+    explicit AuthService(drogon::orm::DbClientPtr client);
+
+    void registerUser(
             const std::string &email,
             const std::string &password,
             const std::function<void(const UserDTO&, const AppError&)>& cb
     );
 
-    static void loginUser(
+    void loginUser(
             const std::string &email,
             const std::string &password,
             const std::function<void(const SessionDTO&, const AppError&)>& cb
     );
 
-    static void logout(
+    void logout(
             const std::string &token,
             const std::function<void(const AppError&)>& cb
     );
 
-    static void requestPasswordReset(
+    void requestPasswordReset(
             const std::string& email,
             std::function<void(const AppError&)>&& cb
     );
 
-    static void resetPassword(
+    void resetPassword(
             const std::string& token,
             const std::string& newPassword,
             std::function<void(const AppError&)>&& cb
     );
+
+private:
+    drogon::orm::DbClientPtr client_;
 };

@@ -7,43 +7,11 @@
 #include "repositories/TagsRepository.h"
 #include "dto/TagDTO.h"
 #include "core/AppError.h"
+
 #include "tests/integration/db_bootstrap.h"
+#include "tests/integration/db_builders.h"
 
 using drogon::orm::DbClientPtr;
-
-namespace {
-
-    TagDTO createTestTag(
-            const DbClientPtr& client,
-            const std::string& name
-    ) {
-        std::promise<TagDTO> tagPromise;
-        std::promise<AppError> errPromise;
-
-        TagsRepository::createTag(
-                client,
-                name,
-                [&](const TagDTO& tag, const AppError& err) {
-                    tagPromise.set_value(tag);
-                    errPromise.set_value(err);
-                }
-        );
-
-        auto tag = tagPromise.get_future().get();
-        auto err = errPromise.get_future().get();
-
-        REQUIRE_FALSE(err.hasError());
-        REQUIRE(tag.id > 0);
-        REQUIRE(tag.name == name);
-
-        return tag;
-    }
-
-} // namespace
-
-// ------------------------------------------------------------
-// Tests
-// ------------------------------------------------------------
 
 TEST_CASE("TagsRepository::createTag inserts a tag") {
     auto client = db::bootstrap::makeClient();
@@ -73,7 +41,7 @@ TEST_CASE("TagsRepository::createTag rejects duplicate tag names") {
     auto client = db::bootstrap::makeClient();
     db::bootstrap::resetDb(client);
 
-    createTestTag(client, "cpp");
+    db::builder::createTag(client, "cpp");
 
     std::promise<TagDTO> tagPromise;
     std::promise<AppError> errPromise;
@@ -97,9 +65,9 @@ TEST_CASE("TagsRepository::listTags returns all tags ordered by name") {
     auto client = db::bootstrap::makeClient();
     db::bootstrap::resetDb(client);
 
-    createTestTag(client, "zeta");
-    createTestTag(client, "alpha");
-    createTestTag(client, "middle");
+    db::builder::createTag(client, "zeta");
+    db::builder::createTag(client, "alpha");
+    db::builder::createTag(client, "middle");
 
     std::promise<std::vector<TagDTO>> listPromise;
     std::promise<AppError> errPromise;
@@ -127,7 +95,7 @@ TEST_CASE("TagsRepository::findById returns existing tag") {
     auto client = db::bootstrap::makeClient();
     db::bootstrap::resetDb(client);
 
-    auto created = createTestTag(client, "infra");
+    auto created = db::builder::createTag(client, "infra");
 
     std::promise<std::optional<TagDTO>> tagPromise;
     std::promise<AppError> errPromise;

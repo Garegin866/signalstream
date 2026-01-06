@@ -23,7 +23,7 @@ namespace db::bootstrap {
         client->execSqlSync("TRUNCATE TABLE users, reset_tokens, sessions, "
                             "items, item_tags, "
                             "tags, user_tags, item_tags, "
-                            "notifications RESTART IDENTITY;");
+                            "notifications RESTART IDENTITY CASCADE;");
     }
 
-}
+} // namespace db::bootstrap
