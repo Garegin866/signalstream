@@ -7,6 +7,7 @@
 #include "repositories/ItemsRepository.h"
 #include "repositories/TagsRepository.h"
 #include "repositories/ItemTagsRepository.h"
+#include "repositories/UserTagsRepository.h"
 
 using drogon::orm::DbClientPtr;
 
@@ -90,7 +91,7 @@ namespace db::builder {
         return result;
     }
 
-    inline void attachTagToItem (
+    inline void attachTagToItem(
             const DbClientPtr& client,
             int itemId,
             int tagId
@@ -101,6 +102,27 @@ namespace db::builder {
                 client,
                 itemId,
                 {tagId},
+                [&](bool, const AppError& e) {
+                    errPromise.set_value(e);
+                }
+        );
+
+        auto err = errPromise.get_future().get();
+
+        REQUIRE_FALSE(err.hasError());
+    }
+
+    inline void attachTagToUser(
+            const DbClientPtr& client,
+            int userId,
+            int tagId
+    ) {
+        std::promise<AppError> errPromise;
+
+        UserTagsRepository::attach(
+                client,
+                userId,
+                tagId,
                 [&](bool, const AppError& e) {
                     errPromise.set_value(e);
                 }

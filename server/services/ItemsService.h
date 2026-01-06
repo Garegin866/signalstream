@@ -7,9 +7,13 @@
 #include <functional>
 #include <optional>
 
+#include <drogon/orm/DbClient.h>
+
 class ItemsService {
 public:
-    static void createItem(
+    explicit ItemsService(drogon::orm::DbClientPtr client);
+
+    void createItem(
             const std::string& title,
             const std::string& description,
             const std::string& url,
@@ -17,12 +21,12 @@ public:
             const std::function<void(const ItemDTO&, const AppError&)>& cb
     );
 
-    static void getItem(
+    void getItem(
             int itemId,
             const std::function<void(const std::optional<ItemDTO>&, const AppError&)>& cb
     );
 
-    static void updateItem(
+    void updateItem(
             int itemId,
             const std::optional<std::string>& title,
             const std::optional<std::string>& description,
@@ -30,13 +34,16 @@ public:
             const std::function<void(const std::optional<ItemDTO>&, const AppError&)>& cb
     );
 
-    static void deleteItem(
+    void deleteItem(
             int itemId,
             const std::function<void(const AppError&)>& cb
     );
 
-    static void listItems(
+    void listItems(
             const Pagination& pagination,
             const std::function<void(const std::vector<ItemDTO>&, const AppError&)>& cb
     );
+
+private:
+    drogon::orm::DbClientPtr client_;
 };

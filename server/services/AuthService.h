@@ -5,7 +5,6 @@
 
 #include <functional>
 #include <optional>
-
 #include <drogon/orm/DbClient.h>
 
 class AuthService {
