@@ -153,7 +153,7 @@ void UserRepository::updateRole(
                 auto M = MapperRegistry<UserDTO, UserMapper>::get();
                 cb(M.fromRow(r[0]), AppError{});
             },
-            [cb](const std::exception_ptr &eptr) {
+            [cb](const std::exception_ptr &) {
                 cb({}, AppError::Database("Failed to update role"));
             },
             userId,

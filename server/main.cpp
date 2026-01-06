@@ -2,7 +2,7 @@
 
 int main() {
     drogon::app()
-            .loadConfigFile("config.json")
+            .loadConfigFile("config/config.dev.json")
             .run();
 
     return 0;

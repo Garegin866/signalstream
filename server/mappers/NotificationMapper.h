@@ -25,12 +25,7 @@ public:
         return dto;
     }
 
-    [[nodiscard]] Json::Value toJson(const NotificationDTO &dto) const override {
-        Json::Value body;
-//        body[Const::JSON_ID] = dto.id;
-//        body[Const::JSON_EMAIL] = dto.email;
-//        body[Const::JSON_ROLE] = toString(dto.role);
-
-        return body;
+    [[nodiscard]] Json::Value toJson(const NotificationDTO &) const override {
+        return Json::Value {};
     }
 };

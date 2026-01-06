@@ -2,7 +2,7 @@
 
 #include <drogon/orm/DbClient.h>
 
-#include "../core/Constants.h"
+#include "core/Constants.h"
 
 void TagsRepository::createTag(
         const drogon::orm::DbClientPtr& client,
