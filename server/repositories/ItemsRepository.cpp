@@ -153,7 +153,7 @@ void ItemsRepository::getItemsByTagIds(
     std::string arr = toPgArray(tagIds);
 
     client->execSqlAsync(
-            "SELECT DISTINCT i.id, i.title "
+            "SELECT DISTINCT i.id, i.title, i.description, i.url, i.created_at "
             "FROM items i "
             "JOIN item_tags it ON i.id = it.item_id "
             "WHERE it.tag_id = ANY($1::int[]) "

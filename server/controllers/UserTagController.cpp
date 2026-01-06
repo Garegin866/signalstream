@@ -10,6 +10,7 @@ void UserTagController::attach(
         const drogon::HttpRequestPtr &req,
         std::function<void(const drogon::HttpResponsePtr&)> &&callback
 ) {
+
     REQUIRE_AUTH_USER(req, callback, user)
 
     auto json = req->getJsonObject();

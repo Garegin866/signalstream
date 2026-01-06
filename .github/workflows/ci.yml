@@ -50,6 +50,3 @@ jobs:
 
       - name: Build
         run: cmake --build build -j
-
-      - name: Run unit tests
-        run: echo "No tests yet"
