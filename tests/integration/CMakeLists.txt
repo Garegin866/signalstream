@@ -14,6 +14,7 @@ set(INTEGRATION_TESTS
         tags_repository/test_tags_repository.cpp
         item_tags_repository/test_item_tags_repository.cpp
         user_tags_repository/test_user_tags_repository.cpp
+        feed_repository/test_feed_repository.cpp
 )
 
 add_executable(${PROJECT_NAME}
