@@ -10,6 +10,21 @@ jobs:
   tests:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: signaldb_test
+          POSTGRES_USER: signaluser
+          POSTGRES_PASSWORD: signalpass
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U signaluser -d signaldb_test"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=30
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
