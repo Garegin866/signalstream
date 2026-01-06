@@ -1,6 +1,10 @@
 #include "TagsService.h"
-#include <drogon/HttpAppFramework.h>
+
 #include "repositories/TagsRepository.h"
+
+TagsService::TagsService(
+        drogon::orm::DbClientPtr client
+) : client_(std::move(client)) {}
 
 void TagsService::createTag(
         const std::string &name,
@@ -11,13 +15,11 @@ void TagsService::createTag(
         return;
     }
 
-    auto client = drogon::app().getDbClient();
-    TagsRepository::createTag(client, name, cb);
+    TagsRepository::createTag(client_, name, cb);
 }
 
 void TagsService::listTags(
         const std::function<void(const std::vector<TagDTO>&, const AppError&)>& cb
 ) {
-    auto client = drogon::app().getDbClient();
-    TagsRepository::listTags(client, cb);
+    TagsRepository::listTags(client_, cb);
 }

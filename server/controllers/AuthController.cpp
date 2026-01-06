@@ -24,7 +24,10 @@ void AuthController::registerUser(
     auto email = (*json)[Const::JSON_EMAIL].asString();
     auto password = (*json)[Const::JSON_PASSWORD].asString();
 
-    AuthService::registerUser(
+    auto client = drogon::app().getDbClient();
+
+    AuthService authService(client);
+    authService.registerUser(
             email,
             password,
             [callback, req](const UserDTO &user, const AppError &err) {
@@ -52,7 +55,10 @@ void AuthController::loginUser(
     auto email = (*json)[Const::JSON_EMAIL].asString();
     auto password = (*json)[Const::JSON_PASSWORD].asString();
 
-    AuthService::loginUser(
+    auto client = drogon::app().getDbClient();
+
+    AuthService authService(client);
+    authService.loginUser(
             email,
             password,
             [callback, req](const SessionDTO &session, const AppError &err) {
@@ -87,7 +93,10 @@ void AuthController::logout(
 ) {
     REQUIRE_AUTH_USER_WITH_TOKEN(req, callback, user, token)
 
-    AuthService::logout(
+    auto client = drogon::app().getDbClient();
+
+    AuthService authService(client);
+    authService.logout(
             token,
             [callback, req](const AppError& err) {
                 if (err.hasError()) {
@@ -115,7 +124,10 @@ void AuthController::resetRequest(
         return;
     }
 
-    AuthService::requestPasswordReset(
+    auto client = drogon::app().getDbClient();
+
+    AuthService authService(client);
+    authService.requestPasswordReset(
             (*json)[Const::JSON_EMAIL].asString(),
             [callback](const AppError&) {
                 Json::Value res;
@@ -139,7 +151,10 @@ void AuthController::resetConfirm(
         return;
     }
 
-    AuthService::resetPassword(
+    auto client = drogon::app().getDbClient();
+
+    AuthService authService(client);
+    authService.resetPassword(
             (*json)[Const::JSON_TOKEN].asString(),
             (*json)[Const::JSON_PASSWORD].asString(),
             [callback, req](const AppError& err) {

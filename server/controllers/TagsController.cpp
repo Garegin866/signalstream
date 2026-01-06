@@ -10,7 +10,10 @@ void TagsController::listTags(
         const HttpRequestPtr &req,
         std::function<void(const HttpResponsePtr &)> &&callback
 ) {
-    TagsService::listTags(
+    auto client = drogon::app().getDbClient();
+
+    TagsService tagsService(client);
+    tagsService.listTags(
             [callback, req](const std::vector<TagDTO> &tags, const AppError &err) {
                 if (err.hasError()) {
                     callback(makeErrorResponse(err, req));
@@ -48,7 +51,10 @@ void TagsController::createTag(
 
     auto name = (*json)[Const::JSON_NAME].asString();
 
-    TagsService::createTag(
+    auto client = drogon::app().getDbClient();
+
+    TagsService tagsService(client);
+    tagsService.createTag(
             name,
             [callback, req](const TagDTO &dto, const AppError &err) {
                 if (err.hasError()) {

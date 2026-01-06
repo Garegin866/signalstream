@@ -5,7 +5,9 @@
 #include "repositories/ItemTagsRepository.h"
 #include "repositories/NotificationRepository.h"
 
-#include <drogon/drogon.h>
+ItemsService::ItemsService(
+        drogon::orm::DbClientPtr client
+) : client_(std::move(client)) {}
 
 void ItemsService::createItem(
         const std::string& title,
@@ -14,11 +16,14 @@ void ItemsService::createItem(
         const std::vector<int>& tagIds,
         const std::function<void(const ItemDTO&, const AppError&)>& cb
 ) {
-    auto client = drogon::app().getDbClient();
+    if (title.empty() || url.empty()) {
+        cb({}, AppError::Validation("Title and URL must not be empty"));
+        return;
+    }
 
     ItemsRepository::createItem(
-            client, title, description, url,
-            [client, tagIds, cb](const ItemDTO& created, const AppError& err) {
+            client_, title, description, url,
+            [this, tagIds, cb](const ItemDTO& created, const AppError& err) {
                 if (err.hasError()) {
                     cb({}, err);
                     return;
@@ -30,26 +35,26 @@ void ItemsService::createItem(
                 }
 
                 ItemTagsRepository::attachTagsToItem(
-                        client,
+                        client_,
                         created.id,
                         tagIds,
-                        [client, created, tagIds, cb](bool ok, const AppError& err2) {
+                        [this, created, tagIds, cb](bool, const AppError& err2) {
                             if (err2.hasError()) {
                                 cb({}, err2);
                                 return;
                             }
 
                             UserTagsRepository::findUsersByTagIds(
-                                    client,
+                                    client_,
                                     tagIds,
-                                    [client, created, cb](const std::vector<int>& userIds, const AppError& err3) {
+                                    [this, created, cb](const std::vector<int>& userIds, const AppError& err3) {
                                         if (err3.hasError()) {
                                             cb({}, err3);
                                             return;
                                         }
 
                                         NotificationRepository::insertBulkForUsers(
-                                                client,
+                                                client_,
                                                 userIds,
                                                 "item_created",
                                                 "A new item has been added: " + created.title,
@@ -75,10 +80,8 @@ void ItemsService::getItem(
         int itemId,
         const std::function<void(const std::optional<ItemDTO>&, const AppError&)>& cb
 ) {
-    auto client = drogon::app().getDbClient();
-
     ItemsRepository::getItemById(
-            client,
+            client_,
             itemId,
             [cb](const std::optional<ItemDTO>& item, const AppError& err) {
                 cb(item, err);
@@ -93,10 +96,8 @@ void ItemsService::updateItem(
         const std::optional<std::string>& url,
         const std::function<void(const std::optional<ItemDTO>&, const AppError&)>& cb
 ) {
-    auto client = drogon::app().getDbClient();
-
     ItemsRepository::updateItem(
-            client,
+            client_,
             itemId,
             title,
             description,
@@ -111,10 +112,8 @@ void ItemsService::deleteItem(
         int itemId,
         const std::function<void(const AppError&)>& cb
 ) {
-    auto client = drogon::app().getDbClient();
-
     ItemsRepository::deleteItem(
-            client,
+            client_,
             itemId,
             [cb](const AppError& err) {
                 cb(err);
@@ -127,10 +126,8 @@ void ItemsService::listItems(
         const Pagination& pagination,
         const std::function<void(const std::vector<ItemDTO>&, const AppError&)>& cb
 ) {
-    auto client = drogon::app().getDbClient();
-
     ItemsRepository::listAll(
-            client,
+            client_,
             pagination,
             [cb](const std::vector<ItemDTO>& items, const AppError& err) {
                 cb(items, err);

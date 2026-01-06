@@ -37,7 +37,10 @@ void ItemsController::createItem(
         }
     }
 
-    ItemsService::createItem(
+    auto client = drogon::app().getDbClient();
+
+    ItemsService itemsService(client);
+    itemsService.createItem(
             title,
             description,
             url,
@@ -60,7 +63,10 @@ void ItemsController::getItem(
         std::function<void(const drogon::HttpResponsePtr&)>&& cb,
         int itemId
 ) {
-    ItemsService::getItem(
+    auto client = drogon::app().getDbClient();
+
+    ItemsService itemsService(client);
+    itemsService.getItem(
             itemId,
             [cb, req](const std::optional<ItemDTO>& item, const AppError& err) {
                 if (err.hasError()) {
@@ -91,7 +97,10 @@ void ItemsController::listItems(
         return;
     }
 
-    ItemsService::listItems(
+    auto client = drogon::app().getDbClient();
+
+    ItemsService itemsService(client);
+    itemsService.listItems(
             pagination,
             [cb, pagination, req](const std::vector<ItemDTO>& items, const AppError& err) {
                 if (err.hasError()) {
@@ -155,7 +164,10 @@ void ItemsController::updateItem(
         return;
     }
 
-    ItemsService::updateItem(
+    auto client = drogon::app().getDbClient();
+
+    ItemsService itemsService(client);
+    itemsService.updateItem(
             itemId, title, description, url,
             [cb, req](const std::optional<ItemDTO>& item, const AppError& err) {
                 if (err.hasError()) {
@@ -182,7 +194,10 @@ void ItemsController::deleteItem(
 ) {
     REQUIRE_MOD_OR_ADMIN(req, cb);
 
-    ItemsService::deleteItem(
+    auto client = drogon::app().getDbClient();
+
+    ItemsService itemsService(client);
+    itemsService.deleteItem(
             itemId,
             [cb, req](const AppError& err) {
                 if (err.hasError()) {
