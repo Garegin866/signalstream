@@ -26,4 +26,4 @@ namespace db::bootstrap {
                             "notifications RESTART IDENTITY;");
     }
 
-}
+} // namespace db::bootstrap

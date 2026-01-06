@@ -3,72 +3,21 @@
 #include <drogon/orm/DbClient.h>
 
 #include "repositories/UserTagsRepository.h"
-#include "repositories/UserRepository.h"
-#include "repositories/TagsRepository.h"
+
 #include "dto/TagDTO.h"
 #include "core/AppError.h"
+
 #include "tests/integration/db_bootstrap.h"
+#include "tests/integration/db_builders.h"
 
 using drogon::orm::DbClientPtr;
-
-namespace {
-// ------------------------------------------------------------
-// Helpers
-// ------------------------------------------------------------
-    int createUser(const DbClientPtr& client, const std::string& email) {
-        std::promise<UserDTO> userPromise;
-        std::promise<AppError> errPromise;
-
-        UserRepository::createUser(
-                client,
-                email,
-                "hash",
-                [&](const UserDTO& u, const AppError& e) {
-                    userPromise.set_value(u);
-                    errPromise.set_value(e);
-                }
-        );
-
-        auto user = userPromise.get_future().get();
-        auto err  = errPromise.get_future().get();
-
-        REQUIRE_FALSE(err.hasError());
-        return user.id;
-    }
-
-    int createTag(const DbClientPtr& client, const std::string& name) {
-        std::promise<TagDTO> tagPromise;
-        std::promise<AppError> errPromise;
-
-        TagsRepository::createTag(
-                client,
-                name,
-                [&](const TagDTO& t, const AppError& e) {
-                    tagPromise.set_value(t);
-                    errPromise.set_value(e);
-                }
-        );
-
-        auto tag = tagPromise.get_future().get();
-        auto err = errPromise.get_future().get();
-
-        REQUIRE_FALSE(err.hasError());
-
-        return tag.id;
-    }
-
-} // namespace
-
-// ============================================================
-// Tests
-// ============================================================
 
 TEST_CASE("UserTagsRepository::attach attaches tag to user") {
     auto client = db::bootstrap::makeClient();
     db::bootstrap::resetDb(client);
 
-    int userId = createUser(client, "user1@test.com");
-    int tagId  = createTag(client, "cpp");
+    int userId = db::builder::createUser(client, "user1@test.com").id;
+    int tagId  = db::builder::createTag(client, "cpp").id;
 
     std::promise<bool> okP;
     std::promise<AppError> errP;
@@ -94,8 +43,8 @@ TEST_CASE("UserTagsRepository::attach blocks duplicates") {
     auto client = db::bootstrap::makeClient();
     db::bootstrap::resetDb(client);
 
-    int userId = createUser(client, "user2@test.com");
-    int tagId  = createTag(client, "backend");
+    int userId = db::builder::createUser(client, "user2@test.com").id;
+    int tagId  = db::builder::createTag(client, "backend").id;
 
     // First attach
     {
@@ -136,9 +85,9 @@ TEST_CASE("UserTagsRepository::listForUser returns correct tags") {
     auto client = db::bootstrap::makeClient();
     db::bootstrap::resetDb(client);
 
-    int userId = createUser(client, "user3@test.com");
-    int tagA   = createTag(client, "alpha");
-    int tagB   = createTag(client, "beta");
+    int userId = db::builder::createUser(client, "user3@test.com").id;
+    int tagA   = db::builder::createTag(client, "alpha").id;
+    int tagB   = db::builder::createTag(client, "beta").id;
 
     UserTagsRepository::attach(client, userId, tagA, [](bool, const AppError&){});
     UserTagsRepository::attach(client, userId, tagB, [](bool, const AppError&){});
@@ -166,9 +115,9 @@ TEST_CASE("UserTagsRepository::findUsersByTagIds returns correct users") {
     auto client = db::bootstrap::makeClient();
     db::bootstrap::resetDb(client);
 
-    int user1 = createUser(client, "u1@test.com");
-    int user2 = createUser(client, "u2@test.com");
-    int tag   = createTag(client, "infra");
+    int user1 = db::builder::createUser(client, "u1@test.com").id;
+    int user2 = db::builder::createUser(client, "u2@test.com").id;
+    int tag   = db::builder::createTag(client, "infra").id;
 
     UserTagsRepository::attach(client, user1, tag, [](bool, const AppError&){});
     UserTagsRepository::attach(client, user2, tag, [](bool, const AppError&){});

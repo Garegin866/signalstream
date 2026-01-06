@@ -5,89 +5,17 @@
 #include "repositories/ItemsRepository.h"
 #include "dto/ItemDTO.h"
 #include "core/AppError.h"
+
 #include "tests/integration/db_bootstrap.h"
+#include "tests/integration/db_builders.h"
 
 using drogon::orm::DbClientPtr;
 
-namespace {
-
-    DbClientPtr makeClient() {
-        static DbClientPtr client;
-
-        if (!client) {
-            client = drogon::orm::DbClient::newPgClient(
-                    "host=127.0.0.1 port=5432 dbname=signaldb_test user=signaluser password=signalpass",
-                    1
-            );
-        }
-
-        return client;
-    }
-
-    void resetDb(const DbClientPtr& client) {
-        client->execSqlSync("TRUNCATE TABLE item_tags, tags, items, user_tags RESTART IDENTITY;");
-    }
-
-    ItemDTO createItem(
-            const DbClientPtr& client,
-            const std::string& title = "Title",
-            const std::string& desc  = "Desc",
-            const std::string& url   = "https://example.com"
-    ) {
-        std::promise<ItemDTO> itemPromise;
-        std::promise<AppError> errorPromise;
-
-        ItemsRepository::createItem(
-                client,
-                title,
-                desc,
-                url,
-                [&](const ItemDTO& item, const AppError& e) {
-                    itemPromise.set_value(item);
-                    errorPromise.set_value(e);
-                }
-        );
-
-        auto result = itemPromise.get_future().get();
-        auto err    = errorPromise.get_future().get();
-
-        REQUIRE_FALSE(err.hasError());
-        REQUIRE(result.id >= 0);
-
-        return result;
-    }
-
-    int createTag(const DbClientPtr& client, const std::string& name) {
-        auto r = client->execSqlSync(
-                "INSERT INTO tags (name) VALUES ($1) RETURNING id;",
-                name
-        );
-        return r[0][0].as<int>();
-    }
-
-    void linkItemTag(
-            const DbClientPtr& client,
-            int itemId,
-            int tagId
-    ) {
-        client->execSqlSync(
-                "INSERT INTO item_tags (item_id, tag_id) VALUES ($1, $2);",
-                itemId,
-                tagId
-        );
-    }
-
-} // namespace
-
-// ------------------------------------------------------------
-// Tests
-// ------------------------------------------------------------
-
 TEST_CASE("ItemsRepository::createItem inserts item") {
-    auto client = makeClient();
-    resetDb(client);
+    auto client = db::bootstrap::makeClient();
+    db::bootstrap::resetDb(client);
 
-    auto item = createItem(client, "A", "B", "C");
+    auto item = db::builder::createItem(client, "A", "B", "C");
 
     REQUIRE(item.title == "A");
     REQUIRE(item.description == "B");
@@ -95,10 +23,10 @@ TEST_CASE("ItemsRepository::createItem inserts item") {
 }
 
 TEST_CASE("ItemsRepository::getItemById returns item") {
-    auto client = makeClient();
-    resetDb(client);
+    auto client = db::bootstrap::makeClient();
+    db::bootstrap::resetDb(client);
 
-    auto created = createItem(client);
+    auto created = db::builder::createItem(client);
 
     std::promise<std::optional<ItemDTO>> itemPromise;
     std::promise<AppError> errorPromise;
@@ -121,8 +49,8 @@ TEST_CASE("ItemsRepository::getItemById returns item") {
 }
 
 TEST_CASE("ItemsRepository::getItemById returns nullopt for unknown id") {
-    auto client = makeClient();
-    resetDb(client);
+    auto client = db::bootstrap::makeClient();
+    db::bootstrap::resetDb(client);
 
     std::promise<std::optional<ItemDTO>> itemPromise;
     std::promise<AppError> errorPromise;
@@ -144,10 +72,10 @@ TEST_CASE("ItemsRepository::getItemById returns nullopt for unknown id") {
 }
 
 TEST_CASE("ItemsRepository::updateItem updates fields") {
-    auto client = makeClient();
-    resetDb(client);
+    auto client = db::bootstrap::makeClient();
+    db::bootstrap::resetDb(client);
 
-    auto created = createItem(client);
+    auto created = db::builder::createItem(client);
 
     std::promise<std::optional<ItemDTO>> itemPromise;
     std::promise<AppError> errorPromise;
@@ -174,10 +102,10 @@ TEST_CASE("ItemsRepository::updateItem updates fields") {
 }
 
 TEST_CASE("ItemsRepository::deleteItem removes item") {
-    auto client = makeClient();
-    resetDb(client);
+    auto client = db::bootstrap::makeClient();
+    db::bootstrap::resetDb(client);
 
-    auto created = createItem(client);
+    auto created = db::builder::createItem(client);
 
     std::promise<AppError> errorPromise;
 
@@ -209,12 +137,12 @@ TEST_CASE("ItemsRepository::deleteItem removes item") {
 }
 
 TEST_CASE("ItemsRepository::listAll respects pagination") {
-    auto client = makeClient();
-    resetDb(client);
+    auto client = db::bootstrap::makeClient();
+    db::bootstrap::resetDb(client);
 
-    createItem(client, "1");
-    createItem(client, "2");
-    createItem(client, "3");
+    db::builder::createItem(client, "1");
+    db::builder::createItem(client, "2");
+    db::builder::createItem(client, "3");
 
     std::promise<std::vector<ItemDTO>> itemsPromise;
     std::promise<AppError> errorPromise;
@@ -241,17 +169,17 @@ TEST_CASE("ItemsRepository::listAll respects pagination") {
 }
 
 TEST_CASE("ItemsRepository::getItemsByTagIds returns tagged items") {
-    auto client = makeClient();
-    resetDb(client);
+    auto client = db::bootstrap::makeClient();
+    db::bootstrap::resetDb(client);
 
-    auto item1 = createItem(client, "item1");
-    auto item2 = createItem(client, "item2");
+    auto item1 = db::builder::createItem(client, "item1");
+    auto item2 = db::builder::createItem(client, "item2");
 
-    int tagA = createTag(client, "tagA");
-    int tagB = createTag(client, "tagB");
+    int tagA = db::builder::createTag(client, "tagA").id;
+    int tagB = db::builder::createTag(client, "tagB").id;
 
-    linkItemTag(client, item1.id, tagA);
-    linkItemTag(client, item2.id, tagB);
+    db::builder::attachTagToItem(client, item1.id, tagA);
+    db::builder::attachTagToItem(client, item2.id, tagB);
 
     std::promise<std::vector<ItemDTO>> itemsPromise;
     std::promise<AppError> errorPromise;

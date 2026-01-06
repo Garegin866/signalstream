@@ -83,7 +83,7 @@ void AuthService::logout(
                     cb(AppError::Database("Could not delete session"));
                     return;
                 }
-                cb(AppError{}); // success
+                cb(AppError{});
             }
     );
 }
