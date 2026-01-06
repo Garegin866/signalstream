@@ -7,27 +7,11 @@
 #include "repositories/TagsRepository.h"
 #include "dto/TagDTO.h"
 #include "core/AppError.h"
+#include "tests/integration/db_bootstrap.h"
 
 using drogon::orm::DbClientPtr;
 
 namespace {
-
-    DbClientPtr makeClient() {
-        static DbClientPtr client;
-
-        if (!client) {
-            client = drogon::orm::DbClient::newPgClient(
-                    "host=127.0.0.1 port=5432 dbname=signaldb_test user=signaluser password=signalpass",
-                    1
-            );
-        }
-
-        return client;
-    }
-
-    void resetDb(const DbClientPtr& client) {
-        client->execSqlSync("DELETE FROM tags;");
-    }
 
     TagDTO createTestTag(
             const DbClientPtr& client,
@@ -62,8 +46,8 @@ namespace {
 // ------------------------------------------------------------
 
 TEST_CASE("TagsRepository::createTag inserts a tag") {
-    auto client = makeClient();
-    resetDb(client);
+    auto client = db::bootstrap::makeClient();
+    db::bootstrap::resetDb(client);
 
     std::promise<TagDTO> tagPromise;
     std::promise<AppError> errPromise;
@@ -86,8 +70,8 @@ TEST_CASE("TagsRepository::createTag inserts a tag") {
 }
 
 TEST_CASE("TagsRepository::createTag rejects duplicate tag names") {
-    auto client = makeClient();
-    resetDb(client);
+    auto client = db::bootstrap::makeClient();
+    db::bootstrap::resetDb(client);
 
     createTestTag(client, "cpp");
 
@@ -110,8 +94,8 @@ TEST_CASE("TagsRepository::createTag rejects duplicate tag names") {
 }
 
 TEST_CASE("TagsRepository::listTags returns all tags ordered by name") {
-    auto client = makeClient();
-    resetDb(client);
+    auto client = db::bootstrap::makeClient();
+    db::bootstrap::resetDb(client);
 
     createTestTag(client, "zeta");
     createTestTag(client, "alpha");
@@ -140,8 +124,8 @@ TEST_CASE("TagsRepository::listTags returns all tags ordered by name") {
 }
 
 TEST_CASE("TagsRepository::findById returns existing tag") {
-    auto client = makeClient();
-    resetDb(client);
+    auto client = db::bootstrap::makeClient();
+    db::bootstrap::resetDb(client);
 
     auto created = createTestTag(client, "infra");
 
@@ -167,8 +151,8 @@ TEST_CASE("TagsRepository::findById returns existing tag") {
 }
 
 TEST_CASE("TagsRepository::findById returns NotFound for unknown id") {
-    auto client = makeClient();
-    resetDb(client);
+    auto client = db::bootstrap::makeClient();
+    db::bootstrap::resetDb(client);
 
     std::promise<std::optional<TagDTO>> tagPromise;
     std::promise<AppError> errPromise;

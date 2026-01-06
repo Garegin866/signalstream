@@ -1,3 +1,17 @@
+DROP TABLE IF EXISTS user_tags CASCADE;
+DROP TABLE IF EXISTS item_tags CASCADE;
+DROP TABLE IF EXISTS items CASCADE;
+DROP TABLE IF EXISTS tags CASCADE;
+DROP TABLE IF EXISTS sessions CASCADE;
+DROP TABLE IF EXISTS reset_tokens CASCADE;
+DROP TABLE IF EXISTS notifications CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+DROP INDEX IF EXISTS idx_reset_tokens_token;
+DROP INDEX IF EXISTS idx_reset_tokens_user_id;
+DROP INDEX IF EXISTS idx_user_tags_user_id_tag_id;
+DROP INDEX IF EXISTS idx_item_tags_tag_id_item_id;
+DROP INDEX IF EXISTS idx_items_created_at;
+
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     email TEXT UNIQUE NOT NULL,

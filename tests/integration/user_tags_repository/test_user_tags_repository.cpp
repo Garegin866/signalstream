@@ -7,31 +7,11 @@
 #include "repositories/TagsRepository.h"
 #include "dto/TagDTO.h"
 #include "core/AppError.h"
+#include "tests/integration/db_bootstrap.h"
 
 using drogon::orm::DbClientPtr;
 
 namespace {
-
-// ------------------------------------------------------------
-// DB bootstrap
-// ------------------------------------------------------------
-    DbClientPtr makeClient() {
-        static DbClientPtr client;
-
-        if (!client) {
-            client = drogon::orm::DbClient::newPgClient(
-                    "host=127.0.0.1 port=5432 dbname=signaldb_test user=signaluser password=signalpass",
-                    1
-            );
-        }
-
-        return client;
-    }
-
-    void resetDb(const DbClientPtr& client) {
-        client->execSqlSync("TRUNCATE TABLE user_tags, item_tags, tags, reset_tokens, sessions, notifications, users RESTART IDENTITY;");
-    }
-
 // ------------------------------------------------------------
 // Helpers
 // ------------------------------------------------------------
@@ -84,8 +64,8 @@ namespace {
 // ============================================================
 
 TEST_CASE("UserTagsRepository::attach attaches tag to user") {
-    auto client = makeClient();
-    resetDb(client);
+    auto client = db::bootstrap::makeClient();
+    db::bootstrap::resetDb(client);
 
     int userId = createUser(client, "user1@test.com");
     int tagId  = createTag(client, "cpp");
@@ -111,8 +91,8 @@ TEST_CASE("UserTagsRepository::attach attaches tag to user") {
 }
 
 TEST_CASE("UserTagsRepository::attach blocks duplicates") {
-    auto client = makeClient();
-    resetDb(client);
+    auto client = db::bootstrap::makeClient();
+    db::bootstrap::resetDb(client);
 
     int userId = createUser(client, "user2@test.com");
     int tagId  = createTag(client, "backend");
@@ -153,8 +133,8 @@ TEST_CASE("UserTagsRepository::attach blocks duplicates") {
 }
 
 TEST_CASE("UserTagsRepository::listForUser returns correct tags") {
-    auto client = makeClient();
-    resetDb(client);
+    auto client = db::bootstrap::makeClient();
+    db::bootstrap::resetDb(client);
 
     int userId = createUser(client, "user3@test.com");
     int tagA   = createTag(client, "alpha");
@@ -183,8 +163,8 @@ TEST_CASE("UserTagsRepository::listForUser returns correct tags") {
 }
 
 TEST_CASE("UserTagsRepository::findUsersByTagIds returns correct users") {
-    auto client = makeClient();
-    resetDb(client);
+    auto client = db::bootstrap::makeClient();
+    db::bootstrap::resetDb(client);
 
     int user1 = createUser(client, "u1@test.com");
     int user2 = createUser(client, "u2@test.com");

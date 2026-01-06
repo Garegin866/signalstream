@@ -5,6 +5,7 @@
 #include "repositories/ItemsRepository.h"
 #include "dto/ItemDTO.h"
 #include "core/AppError.h"
+#include "tests/integration/db_bootstrap.h"
 
 using drogon::orm::DbClientPtr;
 

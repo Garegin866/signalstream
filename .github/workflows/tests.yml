@@ -92,6 +92,29 @@ jobs:
         run: cmake --build build -j
 
       # ---------------------------
+      # Init DB schema
+      # ---------------------------
+      - name: Init database schema
+        env:
+          PGPASSWORD: signalpass
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+          
+          # Wait for Postgres explicitly
+          for i in {1..30}; do
+            pg_isready -h 127.0.0.1 -p 5432 -U signaluser -d signaldb_test && break
+            sleep 1
+          done
+
+          psql \
+            -h 127.0.0.1 \
+            -p 5432 \
+            -U signaluser \
+            -d signaldb_test \
+            -f db/init.sql
+
+      # ---------------------------
       # Run tests
       # ---------------------------
       - name: Run tests
