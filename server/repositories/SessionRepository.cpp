@@ -18,6 +18,8 @@ void SessionRepository::createSession(
                 cb(dto, AppError{});
             },
             [cb](const std::exception_ptr &eptr) {
+                (void) eptr;
+
                 cb({}, AppError::Database("Database error"));
             },
             userId, token
@@ -59,7 +61,7 @@ void SessionRepository::deleteByToken(
 ) {
     client->execSqlAsync(
             "DELETE FROM sessions WHERE token=$1;",
-            [cb](const drogon::orm::Result &r) {
+            [cb](const drogon::orm::Result &) {
                 cb(true, AppError{});
             },
             [cb](const std::exception_ptr&) {
@@ -76,7 +78,7 @@ void SessionRepository::deleteByUserId(
 ) {
     client->execSqlAsync(
             "DELETE FROM sessions WHERE user_id=$1;",
-            [cb](const drogon::orm::Result &r) {
+            [cb](const drogon::orm::Result &) {
                 cb(AppError{});
             },
             [cb](const std::exception_ptr&) {

@@ -24,7 +24,7 @@ void FeedController::getFeed(
     FeedService::getFeed(
             user.id,
             pagination,
-            [callback, pagination](const std::vector<FeedItemDTO>& items, const AppError& err) {
+            [callback, pagination](const std::vector<FeedItemDTO>& items, const AppError&) {
                 Json::Value out(Json::arrayValue);
 
                 auto& M = MapperRegistry<FeedItemDTO, FeedMapper>::get();

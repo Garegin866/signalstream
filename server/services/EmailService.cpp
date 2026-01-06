@@ -19,7 +19,7 @@ static utils::SmtpConfig loadSmtpConfig() {
 void EmailService::sendPasswordReset(
         const std::string& to,
         const std::string& token,
-        std::function<void(const AppError&)> cb
+        const std::function<void(const AppError&)>& cb
 ) {
     utils::SmtpConfig cfg = loadSmtpConfig();
 
@@ -35,7 +35,7 @@ void EmailService::sendPasswordReset(
             {to},
             subject,
             body,
-            [cb](bool success, const std::string& error) {
+            [cb](bool success, const std::string&) {
                 if (!success) {
                     cb(AppError::External("Email delivery failed"));
                     return;
@@ -49,7 +49,7 @@ void EmailService::broadcast(
         const std::vector<std::string>& recipients,
         const std::string& subject,
         const std::string& body,
-        std::function<void(const AppError&)> cb
+        const std::function<void(const AppError&)>& cb
 ) {
     utils::SmtpConfig cfg = loadSmtpConfig();
 
@@ -63,7 +63,7 @@ void EmailService::broadcast(
             recipients,
             subject,
             body,
-            [cb](bool success, const std::string& error) {
+            [cb](bool success, const std::string&) {
                 if (!success) {
                     cb(AppError::External("Email delivery failed"));
                     return;

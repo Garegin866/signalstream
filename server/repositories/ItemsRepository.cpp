@@ -138,7 +138,7 @@ void ItemsRepository::createItem(
                 auto& M = MapperRegistry<ItemDTO, ItemMapper>::get();
                 cb(M.fromRow(r[0]), AppError{});
             },
-            [cb](const std::exception_ptr& eptr) {
+            [cb](const std::exception_ptr&) {
                 cb({}, AppError::Database("Failed to create item"));
             },
             title, description, url

@@ -1,0 +1,27 @@
+{
+  "app": {
+    "threads_num": 1
+  },
+
+  "custom_config": {
+    "env": "test",
+    "logging": {
+      "request": { "enabled": false }
+    }
+  },
+
+  "db_clients": [
+    {
+      "name": "default",
+      "rdbms": "postgresql",
+      "host": "127.0.0.1",
+      "port": 5432,
+      "dbname": "signaldb_test",
+      "user": "signaluser",
+      "password": "signalpass",
+      "timeout": 2,
+      "is_fast": false,
+      "client_encoding": "utf8"
+    }
+  ]
+}

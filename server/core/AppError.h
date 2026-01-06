@@ -7,7 +7,7 @@
 static inline std::string normalizeMsg(std::string msg, std::string fallback) {
     auto is_ws = [](unsigned char c){ return std::isspace(c); };
     bool onlyWs = !msg.empty() && std::all_of(msg.begin(), msg.end(), is_ws);
-    if (msg.empty() || onlyWs) return std::move(fallback);
+    if (msg.empty() || onlyWs) return fallback;
     return msg;
 }
 
