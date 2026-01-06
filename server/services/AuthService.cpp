@@ -9,7 +9,9 @@
 #include "repositories/ResetTokenRepository.h"
 #include "core/TimeConstants.h"
 
-#include <drogon/HttpAppFramework.h>
+AuthService::AuthService(
+        drogon::orm::DbClientPtr client
+) : client_(std::move(client)) {}
 
 void AuthService::registerUser(
         const std::string &email,
@@ -22,9 +24,8 @@ void AuthService::registerUser(
     }
 
     auto hash = PasswordHasher::hash(password);
-    auto client = drogon::app().getDbClient();
 
-    UserRepository::createUser(client, email, hash, cb);
+    UserRepository::createUser(client_, email, hash, cb);
 }
 
 void AuthService::loginUser(
@@ -37,12 +38,10 @@ void AuthService::loginUser(
         return;
     }
 
-    auto client = drogon::app().getDbClient();
-
     UserRepository::findByEmail(
-            client,
+            client_,
             email,
-            [password, cb, client](const std::optional<UserDTO> &user, const std::string &hash, const AppError &err) {
+            [this, password, cb](const std::optional<UserDTO> &user, const std::string &hash, const AppError &err) {
                 if (err.type != ErrorType::None) {
                     cb({}, err);
                     return;
@@ -61,7 +60,7 @@ void AuthService::loginUser(
                 auto token = TokenGenerator::generate();
 
                 SessionRepository::createSession(
-                        client,
+                        client_,
                         user->id,
                         token,
                         cb
@@ -74,11 +73,9 @@ void AuthService::logout(
         const std::string &token,
         const std::function<void(const AppError&)>& cb
 ) {
-    auto client = drogon::app().getDbClient();
-
     SessionRepository::deleteByToken(
-            client, token,
-            [cb](bool ok, const AppError& err) {
+            client_, token,
+            [cb](bool, const AppError& err) {
                 if (err.hasError()) {
                     cb(AppError::Database("Could not delete session"));
                     return;
@@ -92,12 +89,10 @@ void AuthService::requestPasswordReset(
         const std::string& email,
         std::function<void(const AppError&)>&& cb
 ) {
-    auto client = drogon::app().getDbClient();
-
     UserRepository::findByEmail(
-            client,
+            client_,
             email,
-            [client, cb](const std::optional<UserDTO>& user, const std::string&, const AppError&) {
+            [this, cb](const std::optional<UserDTO>& user, const std::string&, const AppError&) {
                 if (!user) {
                     cb(AppError{});
                     return;
@@ -107,7 +102,7 @@ void AuthService::requestPasswordReset(
                 auto expiresAt = std::chrono::system_clock::now() + std::chrono::minutes(TimeConstants::PASSWORD_RESET_TTL);
 
                 ResetTokenRepository::create(
-                        client,
+                        client_,
                         user->id,
                         token,
                         expiresAt,
@@ -140,12 +135,10 @@ void AuthService::resetPassword(
         return;
     }
 
-    auto client = drogon::app().getDbClient();
-
     ResetTokenRepository::findValid(
-            client,
+            client_,
             token,
-            [client, newPassword, token, cb](const std::optional<ResetTokenDTO>& dto, const AppError& err) {
+            [this, newPassword, token, cb](const std::optional<ResetTokenDTO>& dto, const AppError& err) {
                 if (err.hasError()) {
                     cb(err);
                     return;
@@ -159,17 +152,17 @@ void AuthService::resetPassword(
                 std::string hash = PasswordHasher::hash(newPassword);
 
                 UserRepository::updatePassword(
-                        client,
+                        client_,
                         dto->userId,
                         hash,
-                        [client, token, cb](const AppError& err2) {
+                        [this, token, cb](const AppError& err2) {
                             if (err2.hasError()) {
                                 cb(err2);
                                 return;
                             }
 
                             ResetTokenRepository::markUsed(
-                                    client,
+                                    client_,
                                     token,
                                     [cb](const AppError& err3) {
                                         if (err3.hasError()) {

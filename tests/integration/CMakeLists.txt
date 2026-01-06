@@ -16,6 +16,7 @@ set(INTEGRATION_TESTS
         repositories/test_user_tags_repository.cpp
         repositories/test_feed_repository.cpp
 
+        services/test_auth_service.cpp
 )
 
 add_executable(${PROJECT_NAME}

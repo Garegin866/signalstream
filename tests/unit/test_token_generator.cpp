@@ -1,4 +1,5 @@
 #include <catch2/catch_all.hpp>
+
 #include "utils/TokenGenerator.h"
 
 #include <unordered_set>
