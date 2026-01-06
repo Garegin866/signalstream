@@ -10,6 +10,10 @@ find_package(Catch2 3 REQUIRED)
 # ----------------------------------
 set(INTEGRATION_TESTS
         user_repository/test_user_repository.cpp
+        items_repository/test_items_repository.cpp
+        tags_repository/test_tags_repository.cpp
+        item_tags_repository/test_item_tags_repository.cpp
+        user_tags_repository/test_user_tags_repository.cpp
 )
 
 add_executable(${PROJECT_NAME}

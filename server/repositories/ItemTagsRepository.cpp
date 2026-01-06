@@ -73,7 +73,7 @@ void ItemTagsRepository::listItemsForTag(
         const std::function<void(const std::vector<ItemDTO>&, const AppError&)>& cb
 ) {
     client->execSqlAsync(
-            "SELECT i.id, i.title "
+            "SELECT i.id, i.title, i.description, i.url, i.created_at "
             "FROM items i "
             "JOIN item_tags it ON i.id = it.item_id "
             "WHERE it.tag_id = $1 "

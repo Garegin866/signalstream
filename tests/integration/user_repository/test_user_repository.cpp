@@ -11,7 +11,6 @@ namespace {
 
     DbClientPtr makeClient() {
         static DbClientPtr client;
-        static std::once_flag schemaOnce;
 
         if (!client) {
             client = drogon::orm::DbClient::newPgClient(
@@ -20,22 +19,11 @@ namespace {
             );
         }
 
-        std::call_once(schemaOnce, [&] {
-            client->execSqlSync(R"(
-                CREATE TABLE IF NOT EXISTS users (
-                        id SERIAL PRIMARY KEY,
-                        email TEXT UNIQUE NOT NULL,
-                        password_hash TEXT NOT NULL,
-                        role TEXT NOT NULL DEFAULT 'user',
-                        created_at TIMESTAMP NOT NULL DEFAULT NOW()
-                );
-            )");
-        });
         return client;
     }
 
     void resetDb(const DbClientPtr& client) {
-        client->execSqlSync("TRUNCATE TABLE users RESTART IDENTITY;");
+        client->execSqlSync("TRUNCATE TABLE users, reset_tokens, sessions, user_tags, notifications RESTART IDENTITY;");
     }
 
     UserDTO createTestUser(
