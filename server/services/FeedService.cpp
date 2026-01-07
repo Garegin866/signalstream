@@ -2,17 +2,17 @@
 
 #include "repositories/FeedRepository.h"
 
-#include <drogon/drogon.h>
+FeedService::FeedService(
+        drogon::orm::DbClientPtr client
+) : client_(std::move(client)) {}
 
 void FeedService::getFeed(
         int userId,
         const Pagination& pagination,
         const std::function<void(const std::vector<FeedItemDTO>&, const AppError&)>& cb
 ) {
-    auto client = drogon::app().getDbClient();
-
     FeedRepository::getFeedForUser(
-            client,
+            client_,
             userId,
             pagination,
             [cb](const std::vector<FeedItemDTO>& items, const AppError& err) {
