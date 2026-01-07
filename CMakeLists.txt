@@ -4,8 +4,36 @@ project(signalstream LANGUAGES CXX)
 # ----------------------------------
 # Global settings
 # ----------------------------------
+option(ENABLE_COVERAGE "Enable code coverage (gcov)" OFF)
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+if (ENABLE_COVERAGE)
+    if (NOT CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        message(FATAL_ERROR "Coverage is only supported with GCC or Clang")
+    endif()
+endif()
+
+# ----------------------------------
+# Coverage configuration (ADDED)
+# ----------------------------------
+if (ENABLE_COVERAGE)
+    add_library(coverage_config INTERFACE)
+
+    target_compile_options(coverage_config INTERFACE
+            --coverage
+            -O0
+            -g
+    )
+
+    target_link_options(coverage_config INTERFACE
+            --coverage
+    )
+
+    # Ensure no optimized build sneaks in
+    set(CMAKE_BUILD_TYPE Debug CACHE STRING "" FORCE)
+endif()
 
 # ----------------------------------
 # Dependencies
@@ -72,6 +100,16 @@ target_link_libraries(signalstream_core PUBLIC
         argon2::argon2
 )
 
+# ----------------------------------
+# Attach coverage ONLY when enabled (ADDED)
+# ----------------------------------
+if (ENABLE_COVERAGE)
+    target_link_libraries(signalstream_core PRIVATE coverage_config)
+endif()
+
+# ----------------------------------
+# Tests & subdirs
+# ----------------------------------
 enable_testing()
 
 add_subdirectory(server)
