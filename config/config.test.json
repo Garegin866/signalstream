@@ -1,15 +1,10 @@
 {
-  "app": {
-    "threads_num": 1
-  },
-
-  "custom_config": {
-    "env": "test",
-    "logging": {
-      "request": { "enabled": false }
+  "listeners": [
+    {
+      "address": "0.0.0.0",
+      "port": 9090
     }
-  },
-
+  ],
   "db_clients": [
     {
       "name": "default",
@@ -19,9 +14,10 @@
       "dbname": "signaldb_test",
       "user": "signaluser",
       "password": "signalpass",
-      "timeout": 2,
-      "is_fast": false,
-      "client_encoding": "utf8"
+      "timeout": 2
     }
-  ]
+  ],
+  "app": {
+    "threads_num": 1
+  }
 }
