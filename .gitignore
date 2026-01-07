@@ -19,3 +19,29 @@ conan.lock
 
 # CMake local presets
 CMakeUserPresets.json
+
+# --------------------------------------------------
+# Coverage / gcov / lcov artifacts
+# --------------------------------------------------
+
+# Coverage output
+coverage/
+coverage/**
+
+# gcov files
+*.gcno
+*.gcda
+*.gcov
+
+# lcov
+lcov.info
+
+# genhtml temporary files
+*.info
+*.html
+*.css
+*.png
+
+# CMake coverage temp
+CMakeFiles/*.gcno
+CMakeFiles/*.gcda
