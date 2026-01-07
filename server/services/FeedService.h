@@ -5,12 +5,18 @@
 #include "pagination/Pagination.h"
 
 #include <functional>
+#include <drogon/orm/DbClient.h>
 
 class FeedService {
 public:
-    static void getFeed(
+    explicit FeedService(drogon::orm::DbClientPtr client);
+
+    void getFeed(
             int userId,
             const Pagination& pagination,
             const std::function<void(const std::vector<FeedItemDTO>&, const AppError&)>& cb
     );
+
+private:
+    drogon::orm::DbClientPtr client_;
 };

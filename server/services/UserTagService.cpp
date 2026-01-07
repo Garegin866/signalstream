@@ -3,18 +3,18 @@
 #include "repositories/TagsRepository.h"
 #include "repositories/UserTagsRepository.h"
 
-#include <drogon/drogon.h>
+UserTagService::UserTagService(
+        drogon::orm::DbClientPtr client
+) : client_(std::move(client)) {}
 
 void UserTagService::attachTag(
         int userId,
         int tagId,
         const std::function<void(const AppError&)>& cb
 ) {
-    auto client = drogon::app().getDbClient();
-
     TagsRepository::findById(
-            client, tagId,
-            [client, userId, tagId, cb](const std::optional<TagDTO>& tag, const AppError& err) {
+            client_, tagId,
+            [this, userId, tagId, cb](const std::optional<TagDTO>& tag, const AppError& err) {
                 if (err.hasError()) {
                     cb(err); // NotFound or Database
                     return;
@@ -25,8 +25,8 @@ void UserTagService::attachTag(
                 }
 
                 UserTagsRepository::attach(
-                        client, userId, tagId,
-                        [cb](bool ok, const AppError& err2) {
+                        client_, userId, tagId,
+                        [cb](bool, const AppError& err2) {
                             if (err2.hasError()) {
                                 cb(err2);
                                 return;
@@ -42,10 +42,8 @@ void UserTagService::listUserTags(
         int userId,
         const std::function<void(const std::vector<TagDTO>&, const AppError&)>& cb
 ) {
-    auto client = drogon::app().getDbClient();
-
     UserTagsRepository::listForUser(
-            client,
+            client_,
             userId,
             [cb](const std::vector<TagDTO>& tags, const AppError& err) {
                 if (err.hasError()) {

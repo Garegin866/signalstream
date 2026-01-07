@@ -26,7 +26,10 @@ void UserTagController::attach(
 
     int tagId = (*json)[Const::JSON_TAG_ID].asInt();
 
-    UserTagService::attachTag(
+    auto client = drogon::app().getDbClient();
+
+    UserTagService userTagService(client);
+    userTagService.attachTag(
             user.id,
             tagId,
             [callback, req](const AppError &err) {
@@ -49,7 +52,10 @@ void UserTagController::list(
 ) {
     REQUIRE_AUTH_USER(req, callback, user)
 
-    UserTagService::listUserTags(
+    auto client = drogon::app().getDbClient();
+
+    UserTagService userTagService(client);
+    userTagService.listUserTags(
             user.id,
             [callback, req](const std::vector<TagDTO>& tags, const AppError& err) {
                 if (err.hasError()) {

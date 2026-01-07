@@ -21,7 +21,10 @@ void FeedController::getFeed(
         return;
     }
 
-    FeedService::getFeed(
+    auto client = drogon::app().getDbClient();
+
+    FeedService feedService(client);
+    feedService.getFeed(
             user.id,
             pagination,
             [callback, pagination](const std::vector<FeedItemDTO>& items, const AppError&) {
