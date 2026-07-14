@@ -13,6 +13,7 @@ set(CONTROLLERS
         controllers/AdminController.cpp
         controllers/NotificationController.cpp
         controllers/DocsController.cpp
+        controllers/HealthController.cpp
 )
 
 set(MIDDLEWARE

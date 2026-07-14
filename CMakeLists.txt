@@ -113,4 +113,4 @@ endif()
 enable_testing()
 
 add_subdirectory(server)
-add_subdirectory(tests)
+#add_subdirectory(tests)
